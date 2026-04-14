@@ -1,3 +1,29 @@
+import numpy as np
+from typing import Union
+
+class VectorNP():
+
+    def __init__(self, array: Union[list, int, float]):
+        self.array = np.array(array)
+    
+    def __add__(self, other):
+        if isinstance(other, np.ndarray):
+            new_vec = self.array + other.array 
+            return new_vec
+        else:
+            return NotImplemented
+    
+    def __sub__(self, other):
+        if isinstance(other, np.ndarray):
+            new_arr = self.array - other.array 
+            return new_arr
+        else:
+            return NotImplemented
+        
+    def __mul__(self, scalar):
+        new_vec = np.multiply(self.array, scalar)
+        return new_vec
+    
 import math
 
 class Vector():
@@ -58,21 +84,41 @@ class Vector():
         for i in range(len(self.array)):
             sum_squares += self.array[i] ** 2
         return math.sqrt(sum_squares)
-                
-v1 = Vector(1, 2, 3)
-v2 = Vector(3, 4, 5)
-print(f"Vector v1 shape: {v1.shape()}\nVector v2 shape: {v2.shape()}")
 
-v_add = v1 + v2
-print(f"Vector addition of {v1} and {v2} = {v_add}")
+import time
 
-v_sub = v1 - v2
-print(f"Vector subtraction of {v1} and {v2} = {v_sub}")
 
-v_scalar_mul = v1 * 4
-print(f"Vector scalar multiply of {v1} and 4 = {v_scalar_mul}")
+def test_classes():
+    # testing 10,000 dot product operations
+    print("Testing custom vector class execution time...")
+    test_vect_a = Vector(1, 2, 3, 4)
+    test_vect_b = Vector(7, 8, 9, 10)
+    custom_start = time.perf_counter()
+    for i in range(10000):
+        test_custom_dot = test_vect_a.dot(test_vect_b)
+        print(f"Custom Dot Product #{i}")
+    custom_stop = time.perf_counter()
 
-v_dot = v1.dot(v2)
-print(f"Vector dot produce of {v1} and {v2} = {v_dot}")
+    total_exec_time = custom_stop - custom_start
+    
 
-print(f"Vector magnitude of v1: {v1.magnitude()}\nVector magnitude of v2: {v2.magnitude()}")
+    print("Testing numpy vector class execution time...")
+    test_vect_a = VectorNP([1, 2, 3, 4])
+    test_vect_b = VectorNP([7, 8, 9, 10])
+    print(f"Array 1: {test_vect_a}\nArray 2: {test_vect_b}")
+    np_start = time.perf_counter()
+    for i in range(10000):
+        test_np_dot = np.dot(test_vect_a.array, test_vect_b.array)
+        print(f"NP Dot Product #{i}")
+    np_stop = time.perf_counter()
+    total_exec_np = np_stop - np_start
+    print(f"Total execution time for NumPY class: {total_exec_np:.6f}")
+    print(f"Total execution time for Custom: {total_exec_time:.6f}")
+
+    test_vect_a = Vector(1, 2, 3, 4)
+    test_vect_b = Vector(7, 8, 9, 10)
+    print(f"Dot product result: {test_vect_a.dot(test_vect_b)}")
+
+if __name__ == "__main__":
+    test_classes()
+    
