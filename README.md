@@ -1,6 +1,6 @@
 # Interpretable Foundations: AI Safety & Security Study Roadmap
 
-[cite_start]A discipline-first roadmap to AI safety research competence spanning 42 weeks (~10.5 months)[cite: 2]. [cite_start]This curriculum bridges foundational mathematics and low-level ML implementations with mechanistic interpretability, causal inference, and adversarial machine learning[cite: 125, 141].
+ A discipline-first roadmap to AI safety research competence spanning 42 weeks (~10.5 months).  This curriculum bridges foundational mathematics and low-level ML implementations with mechanistic interpretability, causal inference, and adversarial machine learning.
 
 ## 📊 Progress Dashboard
 
@@ -21,55 +21,55 @@
 
 ## 🛠️ Execution Protocol
 
-* [cite_start]**Daily Allocation:** 1 hour of focused AI study + 1 hour separate CPTS block[cite: 4].
-* [cite_start]**Session Structure:** ~25 min Conceptual Input 📖 → ~30 min Implementation 💻 → ~5 min Reflection 📝[cite: 13].
-* [cite_start]**The Golden Rule:** Build, don’t memorize[cite: 9]. 
-* [cite_start]**Requirement:** Every concept gets implemented in code[cite: 9]. 
-* [cite_start]**Validation:** If you can’t rebuild it from scratch in NumPy or PyTorch, you don’t understand it yet[cite: 9].
+*  **Daily Allocation:** 1 hour of focused AI study + 1 hour separate CPTS block.
+*  **Session Structure:** ~25 min Conceptual Input 📖 → ~30 min Implementation 💻 → ~5 min Reflection 📝.
+*  **The Golden Rule:** Build, don’t memorize. 
+*  **Requirement:** Every concept gets implemented in code. 
+*  **Validation:** If you can’t rebuild it from scratch in NumPy or PyTorch, you don’t understand it yet.
 
 ---
 
 ## 🗺️ Detailed Phase Tracker
 
 ### 🟥 Phase 1: Mathematical Intuition & NumPy Fluency (Weeks 1–6)
-[cite_start]**Goal:** Develop geometric intuition for linear algebra and calculus, and become fluent in NumPy as your “math scratchpad.” [cite: 24]
+ **Goal:** Develop geometric intuition for linear algebra and calculus, and become fluent in NumPy as your “math scratchpad.” 
 
-#### [cite_start]Week 1: Vectors, Spaces & NumPy Foundations [cite: 33]
-**Theme:** What are vectors, really? [cite_start]And how do we compute with them? [cite: 34]
-
-| Day | Conceptual | Implementation Artifact | Status |
-| :--- | :--- | :--- | :---: |
-| **Mon** | 3B1B Essence of LinAlg: Ep 1 & 2 | [cite_start]`vectors.py` (Pure Python `Vector` class) [cite: 35] | [ ] |
-| **Tue** | 3B1B LinAlg: Ep 3 | [cite_start]`matrix.py` (Extend Vector class to matrices) [cite: 35] | [ ] |
-| **Wed** | MML Ch 2, Sec 2.1–2.3 | [cite_start]Vectorized migration of Vector class to NumPy arrays [cite: 35] | [ ] |
-| **Thu** | 3B1B LinAlg: Ep 4 & 5 | [cite_start]Matplotlib 2D transformation grid visualizer [cite: 35] | [ ] |
-| **Fri** | **FROM SCRATCH CHALLENGE** | [cite_start]Matrix multiplication for arbitrary matrices in pure Python [cite: 35] | [ ] |
-| **Sat** | MML Ch 2, Sec 2.4–2.6 | [cite_start]Linear independence row reduction algorithm [cite: 35] | [ ] |
-
-#### [cite_start]Week 2: Determinants, Inverses & Solving Systems [cite: 36]
-**Theme:** When can we reverse a transformation? [cite_start]What does a determinant tell us? [cite: 37]
+####  Week 1: Vectors, Spaces & NumPy Foundations 
+**Theme:** What are vectors, really?  And how do we compute with them? 
 
 | Day | Conceptual | Implementation Artifact | Status |
 | :--- | :--- | :--- | :---: |
-| **Mon** | 3B1B LinAlg: Ep 6 & 7 | [cite_start]Determinant & 2x2 matrix inversion from scratch [cite: 38] | [ ] |
-| **Tue** | 3B1B LinAlg: Ep 8 & 9 | [cite_start]Gaussian elimination solving $Ax = b$ [cite: 38] | [ ] |
-| **Wed** | MML Ch 2, Sec 2.7–2.9 | [cite_start]Inverse of arbitrary NxN matrix via augmented identity [cite: 38] | [ ] |
-| **Thu** | 3B1B LinAlg: Ep 10 & 11 | [cite_start]Linear system solver profiling solution spaces [cite: 38] | [ ] |
-| **Fri** | **FROM SCRATCH CHALLENGE** | [cite_start]Random 4x4 matrix determinant, inverse, and solve $Ax=b$ [cite: 38] | [ ] |
-| **Sat** | MML Ch 3, Sec 3.1–3.3 | [cite_start]Norms and Cosine similarity nearest-neighbor search [cite: 38] | [ ] |
+| **Mon** | 3B1B Essence of LinAlg: Ep 1 & 2 |  `vectors.py` (Pure Python `Vector` class)  | [ ] |
+| **Tue** | 3B1B LinAlg: Ep 3 |  `matrix.py` (Extend Vector class to matrices)  | [ ] |
+| **Wed** | MML Ch 2, Sec 2.1–2.3 |  Vectorized migration of Vector class to NumPy arrays  | [ ] |
+| **Thu** | 3B1B LinAlg: Ep 4 & 5 |  Matplotlib 2D transformation grid visualizer  | [ ] |
+| **Fri** | **FROM SCRATCH CHALLENGE** |  Matrix multiplication for arbitrary matrices in pure Python  | [ ] |
+| **Sat** | MML Ch 2, Sec 2.4–2.6 |  Linear independence row reduction algorithm  | [ ] |
+
+####  Week 2: Determinants, Inverses & Solving Systems 
+**Theme:** When can we reverse a transformation?  What does a determinant tell us? 
+
+| Day | Conceptual | Implementation Artifact | Status |
+| :--- | :--- | :--- | :---: |
+| **Mon** | 3B1B LinAlg: Ep 6 & 7 |  Determinant & 2x2 matrix inversion from scratch  | [ ] |
+| **Tue** | 3B1B LinAlg: Ep 8 & 9 |  Gaussian elimination solving $Ax = b$  | [ ] |
+| **Wed** | MML Ch 2, Sec 2.7–2.9 |  Inverse of arbitrary NxN matrix via augmented identity  | [ ] |
+| **Thu** | 3B1B LinAlg: Ep 10 & 11 |  Linear system solver profiling solution spaces  | [ ] |
+| **Fri** | **FROM SCRATCH CHALLENGE** |  Random 4x4 matrix determinant, inverse, and solve $Ax=b$  | [ ] |
+| **Sat** | MML Ch 3, Sec 3.1–3.3 |  Norms and Cosine similarity nearest-neighbor search  | [ ] |
 
 ---
 
 ## 📝 Daily Study Log Template
 
-[cite_start]Copy this template into your daily commit message or a running `study_journal.md` file[cite: 19].
+ Copy this template into your daily commit message or a running `study_journal.md` file.
 
 | Metric | Detail |
 | :--- | :--- |
 | **Date** | [YYYY-MM-DD] |
 | **Phase & Topic** | [e.g., Phase 1 - Inverses] |
-| **AI Study Time** | [cite_start][X] mins [cite: 309] |
-| **CPTS Block** | [cite_start][Y] mins [cite: 309] |
-| **Energy Level** | [cite_start][1-5] [cite: 309] |
-| **What Clicked** | [cite_start][Brief insight] [cite: 18] |
-| **Fuzzy Concepts** | [cite_start][Areas to revisit] [cite: 18] |
+| **AI Study Time** |  [X] mins  |
+| **CPTS Block** |  [Y] mins  |
+| **Energy Level** |  [1-5]  |
+| **What Clicked** |  [Brief insight]  |
+| **Fuzzy Concepts** |  [Areas to revisit]  |
