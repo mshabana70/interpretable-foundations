@@ -43,7 +43,7 @@ def solve(A, I):
         nonzero_idxs = [i for i in range(len(combined_matrix)) if i != k]
 
         for i in nonzero_idxs:
-            constant = (combined_matrix[i][k]) / combined_matrix[k][k]
+            constant = combined_matrix[i][k]
             combined_matrix = row_add(combined_matrix, i, k, constant)
     
     num_of_rows = len(combined_matrix)
@@ -72,27 +72,6 @@ def test():
     np_inverse_time = end_time - start_time
     print(f"My execution time: {my_inverse_time}")
     print(f"NumPy execution time: {np_inverse_time}")
-    print("="*30)
-    
-    # A = np.array([[1, 1, 1], [0, 2, 5], [2, 5, -1]]).astype(float)
-    # b = np.array([6, -4, 27]).astype(float)
-
-    # print("="*11, "Test 2", "="*11)
-    # solve(A, b)
-    # print("="*30)
-    
-    # A = np.array([[1, 1, 1], [2, 2, 2], [1, 2, 3]]).astype(float)
-    # b = np.array([1, 3, 4]).astype(float)
-
-    # print("="*11, "Test 3", "="*11)
-    # solve(A, b)
-    # print("="*30)
-    
-    # A = np.array([[1, 1, 1], [1, 2, 3], [2, 3, 4]]).astype(float)
-    # b = np.array([6, 14, 20]).astype(float)
-
-    # print("="*11, "Test 4", "="*11)
-    # solve(A, b)
     print("="*30)
             
 if __name__ == "__main__":

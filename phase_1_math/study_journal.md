@@ -32,3 +32,11 @@ This was a touch one to implement!
 Question: How does elimination relate to row reduction you see in textbooks?
 
 Answer: This is basically algebraic elimination but when doing row reduction, we just extract the coefficients only and work with that.
+
+### Wednesday 6/17
+
+didn't have to change too much for this from the gaussian elimination code, just needed to do a full column sweep for zeroing out the upper and lower triangle of the matrix.
+
+Question: What is the computational cost of inversion?
+
+Answer: for my implementation, it is a time complexity of $O(n^2)$
