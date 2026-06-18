@@ -5,36 +5,28 @@ import numpy as np
 # we'll use matrix rank for this.
 
 # then, we can solve the linear system using Cramer's rule:
-# x_i = det(coefficient matrix with column i replaced with b) / det(coefficient matrix) where b = vector of linear system results.
-
-
-def row_swap(A, i, j):
-    temp = A.copy()
-    temp[i] = A[j] 
-    temp[j] = A[i]
-    return temp
-
-def row_mul(A, i, c):
-    temp = A.copy()
-    temp[i] = A[i] * c
-    return temp
-
-def row_add(A, i, j, c):
-    # returns a matrix with with A[i] + c*A[j]
-    temp = A.copy()
-    temp[i] = A[i] - (c * A[j])
-    return temp
+# x_i = det(coefficient matrix with column i replaced with b) / det(coefficient matrix) 
+# where b = vector of linear system results.
 
 def solve(A, b):
     vector_x = np.array([])
-    for i in range(len(A)):
-        A_replace = A.copy()
-        A_replace[:, i] = b
-        variable_solution = np.linalg.det(A_replace) / np.linalg.det(A)
-        vector_x = np.append(vector_x, variable_solution)
-    
-    print("Ax = b")
-    print(f"A = {A}\nx = {vector_x}\nb = {b}")
+
+    matrix_rank = np.linalg.matrix_rank(A)
+    aug_matrix = np.column_stack((A, b.T))
+    aug_matrix_rank = np.linalg.matrix_rank(aug_matrix)
+
+    if matrix_rank == aug_matrix_rank and matrix_rank >= len(A):
+        for i in range(len(A)):
+            A_replace = A.copy()
+            A_replace[:, i] = b
+            variable_solution = np.linalg.det(A_replace) / np.linalg.det(A)
+            vector_x = np.append(vector_x, variable_solution)
+        print("Ax = b")
+        print(f"A = {A}\nx = {vector_x}\nb = {b}")
+    elif matrix_rank == aug_matrix_rank and matrix_rank < len(A):
+        print(f"Matrix A have infinite solutions!")
+    elif matrix_rank < aug_matrix_rank:
+        print(f"Matrix A have no solutions!")
 
 
 
@@ -46,26 +38,26 @@ def test():
     solve(A, b)
     print("="*30)
     
-    # A = np.array([[1, 1, 1], [0, 2, 5], [2, 5, -1]]).astype(float)
-    # b = np.array([6, -4, 27]).astype(float)
+    A = np.array([[1, 1, 1], [0, 2, 5], [2, 5, -1]]).astype(float)
+    b = np.array([6, -4, 27]).astype(float)
 
-    # print("="*11, "Test 2", "="*11)
-    # solve(A, b)
-    # print("="*30)
+    print("="*11, "Test 2", "="*11)
+    solve(A, b)
+    print("="*30)
     
-    # A = np.array([[1, 1, 1], [2, 2, 2], [1, 2, 3]]).astype(float)
-    # b = np.array([1, 3, 4]).astype(float)
+    A = np.array([[1, 1, 1], [2, 2, 2], [1, 2, 3]]).astype(float)
+    b = np.array([1, 3, 4]).astype(float)
 
-    # print("="*11, "Test 3", "="*11)
-    # solve(A, b)
-    # print("="*30)
+    print("="*11, "Test 3", "="*11)
+    solve(A, b)
+    print("="*30)
     
-    # A = np.array([[1, 1, 1], [1, 2, 3], [2, 3, 4]]).astype(float)
-    # b = np.array([6, 14, 20]).astype(float)
+    A = np.array([[1, 1, 1], [1, 2, 3], [2, 3, 4]]).astype(float)
+    b = np.array([6, 14, 20]).astype(float)
 
-    # print("="*11, "Test 4", "="*11)
-    # solve(A, b)
-    # print("="*30)
+    print("="*11, "Test 4", "="*11)
+    solve(A, b)
+    print("="*30)
             
 if __name__ == "__main__":
     test()

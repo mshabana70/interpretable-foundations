@@ -40,3 +40,12 @@ didn't have to change too much for this from the gaussian elimination code, just
 Question: What is the computational cost of inversion?
 
 Answer: for my implementation, it is a time complexity of $O(n^2)$
+
+### Thursday 6/18
+
+this wasn't so bad but I didn't really do everything from scratch, ended up using numpy's determinant function and matrix rank function for this.
+
+Question: When would you use Cramer's rule vs elimination in practice?
+
+Answer: Gaussian elimination is a much faster operation than Cramer's rule! So I would use gaussian elimination when execution time is vital. Most likely, in cases where the matrices of fairly large and of higher dimensions.
+
