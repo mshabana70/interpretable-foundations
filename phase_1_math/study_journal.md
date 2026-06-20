@@ -49,3 +49,18 @@ Question: When would you use Cramer's rule vs elimination in practice?
 
 Answer: Gaussian elimination is a much faster operation than Cramer's rule! So I would use gaussian elimination when execution time is vital. Most likely, in cases where the matrices of fairly large and of higher dimensions.
 
+### Friday 6/19
+
+Had to look up formula for NxN matrix determinants and inverses: [here](https://www.cliffsnotes.com/study-guides/algebra/linear-algebra/the-determinant/laplace-expansions-for-the-determinant)
+
+Then I had to brush up a bit on recursion to get the det() function working properly.
+
+I keep making the same error with the shallow copys: `matrix.copy()` 
+
+This is a problem especially if I am trying to mutate a matrix in place, it will just reread or reswap my previous mutations so I should always default to creating a new matrix in place rather than copy and mutate the matrix being fed in.
+
+I didn't really account for the no-solution and infinite solution cases in this implementation since I am being lazy but it is in my day 4 which classifies based on matrix rank. Here the only check I ensure is that the det is non-zero since my computations are inverse-driven.
+
+My grade for myself is like a 60% honestly... Made some coding mistakes and had to look up the generalized equations for determinates and inverses since I was only focused on the 2x2 and 3x3 cases earlier in the week.
+
+One thing I will point out is that gaussian eliminations is clearly better for runtime optimization... This cofactor computation in my from-scratch implementation is O(n!) and elimination is O(n^2)
