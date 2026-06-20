@@ -39,7 +39,7 @@ didn't have to change too much for this from the gaussian elimination code, just
 
 Question: What is the computational cost of inversion?
 
-Answer: for my implementation, it is a time complexity of $O(n^2)$
+Answer: for my implementation, it is a time complexity of $O(n^3)$
 
 ### Thursday 6/18
 
@@ -63,4 +63,4 @@ I didn't really account for the no-solution and infinite solution cases in this 
 
 My grade for myself is like a 60% honestly... Made some coding mistakes and had to look up the generalized equations for determinates and inverses since I was only focused on the 2x2 and 3x3 cases earlier in the week.
 
-One thing I will point out is that gaussian eliminations is clearly better for runtime optimization... This cofactor computation in my from-scratch implementation is O(n!) and elimination is O(n^2)
+One thing I will point out is that gaussian eliminations is clearly better for runtime optimization... This cofactor computation in my from-scratch implementation is O(n!) and elimination is O(n^3)
