@@ -18,6 +18,7 @@ def dot(vec_1, vec_2):
     for i in range(vec_len):
         result += vec_1[i] * vec_2[i]
     return result
+    
 def cos_sim(vec_1, vec_2):
     
     vec_1_mag = l2_norm(vec_1)

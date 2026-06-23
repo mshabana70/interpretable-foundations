@@ -75,3 +75,56 @@ Ok important distinction, inner product and cosine similarity can both tell the 
 
 formula for cos sim: sim(v1, v2) = (v1 \dot v2) / (||v1|| * ||v2||)
 
+### Sunday 6/21
+
+catching up since I am a week behind
+
+## Week 3
+
+### Monday 6/22
+
+Eigenvectors are vectors that remain on the span during a transformation.
+
+Eigenvalues are the values by which a eigenvector is stretched or shrinked during a transformation (a scalar value).
+
+Eigenvectors during a 3D rotation become the "axis of rotation" since they remain on their span during the transformation. The eigenvalue in the case of rotation would be 1 since they don't stretch or shrink anything.
+
+This helps provide a faster way of what linear transformations do to a coordinate system. Rather than transform the entire matrix of coordinates, we can determine the eigenvectors and their eigenvalues to see what the outcome of the linear transformation is!
+
+$$ A \cdot \vec{v} = \lambda \vec{v}$$
+
+The matrix-vector multiplication of $A$ and $\vec{v}$ is the same as the scalar multiplication of the eigenvalue $\lambda$ and the $\vec{v}$
+
+Finding the eigenvectors and eigenvalues comes down to finding the values of $\lambda$ and $\vec{v}$ that make the above expression true.
+
+Rewriting the expression: $(A - \lambda \cdot I )\vec{v} = \vec{0}$
+
+Where $(A - \lambda \cdot I)$ would look something like:
+
+$$ 
+\begin{bmatrix}
+a - \lambda & b & c \\
+e & f - \lambda & g \\
+h & i & j - \lambda
+\end{bmatrix}
+$$
+
+This expression can be true in two cases, if $\vec{v} = \vec{0}$ or $\text{det}(A - \lambda \cdot I) = 0$
+
+If there are no real number solutions to $\lambda$ then there are not eigenvectors of the linear transformation! an example of this would be a 90 deg rotation on a 2D plane. 
+
+Eigenbasis can be when basis vectors happen to be the eigenvectors as well.
+
+Ok my first attempt to implement the power iteration method was flawed because I did not reset the value of $\vec{v}_i$ once I normalized it to a unit vector. This messed with the convergence to the dominant vector due to integer overflow. 
+
+The fix was setting the type of the matrix $A$ to a float and then normalizing the vector after each iteration, then setting it to value of the next iterations $\vec{v}_i$. I also don't need to apply the power of A to v each time, just A alone works.
+
+I am also not really handling edge cases here like when the eigenvalues are imaginary.
+
+If we check the diff of the eigenvalue for the old vector and the new vector, this gives a good idea of when the power iter converges.
+
+A better, more robust check is to see if the values of v and lambda satify the residual $\| A \vec{v} - \lambda \vec{v}\|$. This is a stronger check for when to stop the power iteration process and that we identified a dominant eigenvector and eigenvalue.
+
+**Question:** What does an eigenvector "mean" geometrically? Why does ML care?
+
+**Answer:** geometrically, the eigenvector tells us which points in the vector space remain on their span after a linear transformation. This can help pinpoint axes for which a transformation does not alter and rather rotates or transforms other vectors around it. This is useful in ML because it could identify vectors that remain consistent or are a "pattern" in a multi-dimensional space of data.
