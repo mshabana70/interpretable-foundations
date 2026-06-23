@@ -128,3 +128,47 @@ A better, more robust check is to see if the values of v and lambda satify the r
 **Question:** What does an eigenvector "mean" geometrically? Why does ML care?
 
 **Answer:** geometrically, the eigenvector tells us which points in the vector space remain on their span after a linear transformation. This can help pinpoint axes for which a transformation does not alter and rather rotates or transforms other vectors around it. This is useful in ML because it could identify vectors that remain consistent or are a "pattern" in a multi-dimensional space of data.
+
+### Tuesday 6/23
+
+For determinants, we need to first test a matrix for invertibility:
+
+$$AA^{-1} = I$$
+
+$$\text{det}(A) = \begin{vmatrix} a_{11} & a_{12} \\ a_{21} & a_{22} \end{vmatrix} = a_{11}a_{22} - a_{12}a_{21}$$
+
+For a square matrix $T$ that is a *upper-triangular matrix* if $T_{ij} = 0$ for $i > j$, the determinant is the product of the diagonal elements:
+
+$$\text{det}(T) = \prod_{i=1}^{n}T_{ii}$$
+
+For the determinant of a $n \times n$ matrix we can use a algorithm for the $n > 3$ cases:
+
+(*Laplace Expansion*)
+
+1. Expansion along column $j$
+
+$$\text{det}(A) = \sum_{k=1}^{n}(-1)^{k+j}a_{kj}\text{det}(A_{k,j})$$
+
+2. Expansion along row $i$
+
+$$\text{det}(A) = \sum_{k=1}^{n}(-1)^{k+i}a_{ik}\text{det}(A_{i,k})$$
+
+here, $A_{k,j} \in \mathbb{R}^{(n - 1)\times (n-1)}$ is the *submatrix* of $A$ that we get when deleting row $k$ and column $j$.
+
+Jumping ahed a bit, Eigendecomposition follows the following expression:
+
+$$AP = PD$$
+
+Where $A$ is our matrix, $P$ is a matrix of eigenvectors $\vec{p_1}, \vec{p_2}, \ldots, \vec{p_n}$ for matrix $A$, and $D$ is a diagonal matrix of eigenvalues $\lambda_1, \lambda_2, \ldots, \lambda_n$ for matrix $A$. 
+
+Therefore, a *square matrix* $A \in \mathbb{R}^{n \times n}$ can be factored into
+
+$$A = PDP^{-1}$$
+
+where $P \in \mathbb{R}^{n \times n}$ and $D$ is a diagonal matrix whose diagonal entries are the eigenvalues of $A$, if and only if the eigenvectors of $A$ form a basis by $\mathbb{R}^{n}$.
+
+This makes solving for the eigendecomposition fairly straight forward if we are given the eigenvalues and eigenvectors of a matrix. 
+
+**Question:** What types of matrices are diagonlizable?
+
+**Answer:** Matrices with a eigenbasis that falls in $\mathbb{R}^{n}$
