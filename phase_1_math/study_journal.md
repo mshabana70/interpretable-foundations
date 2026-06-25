@@ -172,3 +172,45 @@ This makes solving for the eigendecomposition fairly straight forward if we are 
 **Question:** What types of matrices are diagonalizable?
 
 **Answer:** Matrices with a eigenbasis that falls in $\mathbb{R}^{n}$. Additionally matrices that are real symmetric matrices are always diagonalizable ($A = A^{T}$).
+
+### Wednesday 6/24
+
+Singualar Value Decomposition (SVD) is a way to factor in linear algebra that decomposes a matrix into three other matrices. This allows for a way to represent data in terms of its singualar values.
+
+Mathematically, the SVD of a martix $A$ (of size $m \times n$) is represented by:
+
+$$A = U\Sigma V^{T}$$
+
+Where:
+- $U$ is an $m \times m$ orthogonal martix whose columns are the left singular vectors of $A$.
+- $\Sigma$ is a diagonal $m \times n$ matrix containing the singular values of $A$ is descending order.
+- $V^{T}$ is the transpose of an $n \times n$ orthogonal matrix, where the columns are the right singular vectors of $A$.
+
+Easiest way to understand this is through an example of calculating it. Let $A = \begin{bmatrix} 3 & 2 & 2 \\ 2 & 3 & -2 \end{bmatrix}$
+
+We first calculate $AA^{T}$:
+
+$$A = \begin{bmatrix} 3 & 2 & 2 \\ 2 & 3 & -2 \end{bmatrix}$$
+$$A^{T} = \begin{bmatrix} 3 & 2 \\ 3 & 2 \\ -2 & 2 \end{bmatrix}$$
+$$ A \cdot A^{T} = \begin{bmatrix} 3 & 2 & 2 \\ 2 & 3 & -2 \end{bmatrix} \cdot \begin{bmatrix} 3 & 2 \\ 3 & 2 \\ -2 & 2 \end{bmatrix} = \begin{bmatrix} 17 & 8 \\ 8 & 17 \end{bmatrix}$$
+
+Then we calculate the eigenvalues of $AA^{T}$:
+
+$$\text{det}(AA^{T} - \lambda I) = 0$$
+$$\text{det} \begin{bmatrix} 17 - \lambda & 8 \\ 8 & 17 - \lambda \end{bmatrix} = 0$$
+$$(\lambda - 25)(\lambda - 9) = 0$$
+
+The values for $\lambda_1 = 25$ and $\lambda_2 = 9$. These eigenvalues correspond to the singular values $\sigma_{1} = 5$ and $\sigma_2 = 3$ since the singular values are the square roots of the eigenvalues.
+
+Next we find the *Right Singular Vectors* (Eigenvectors of $A^{T}A$):
+
+**For $\lambda_1 = 25$**: solve $(A^{T}A - 25 I) = \begin{bmatrix} -12 & 12 & 2 \\ 12 & -12 & -2 \\ 2 & -2 & -17 \end{bmatrix}$
+
+we row-reduce this matrix to: $\begin{bmatrix} 1 & -1 & 0 \\ 0 & 0 & 1 \\ 0 & 0 & 0 \end{bmatrix}$
+
+The eigenvector corresponding to $\lambda = 25$ is:
+
+$$v_{1} = \begin{bmatrix} \frac{1}{\sqrt{2}} \\ \frac{1}{\sqrt{2}} \\ 0 \end{bmatrix}$$
+
+**For $\lambda = 9$:** Solve $(A^{T}A - 9 I)v = 0$
+
