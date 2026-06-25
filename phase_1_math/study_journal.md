@@ -214,3 +214,29 @@ $$v_{1} = \begin{bmatrix} \frac{1}{\sqrt{2}} \\ \frac{1}{\sqrt{2}} \\ 0 \end{bma
 
 **For $\lambda = 9$:** Solve $(A^{T}A - 9 I)v = 0$
 
+The eigenvector corresponding to $\lambda = 9$ is $v_2 = \begin{bmatrix} \frac{1}{\sqrt{18}} \\ \frac{-1}{\sqrt{18}} \\ \frac{4}{\sqrt{18}} \end{bmatrix}$
+
+for the third eigenvector $v_3$: Since $v_3$ must be perpendicular to $v_1$ and $v_2$, we solve the system $v_{1}^{T}v_{2} = 0$ and $v_{2}^{T}v_{3} = 0$, leading to:
+
+$$v_{3} = \begin{bmatrix} \frac{2}{3} \\ \frac{-2}{3} \\ \frac{-1}{3}  \end{bmatrix}$$
+
+Now we can finally compute the *Left Singular Vectors* (Matrix $u$):
+
+we use the formula $u_{i} = \frac{1}{\sigma_{i}} Av_{i}$. This results in
+
+$$U = \begin{bmatrix} \frac{1}{\sqrt{2}} & \frac{1}{\sqrt{2}} \\ \frac{1}{\sqrt{2}} & \frac{-1}{\sqrt{2}} \end{bmatrix}$$
+
+This leaves us with the final SVD equation for matrix $A$:
+
+$$U = \begin{bmatrix} \frac{1}{\sqrt{2}} & \frac{1}{\sqrt{2}} \\ \frac{1}{\sqrt{2}} & \frac{-1}{\sqrt{2}} \end{bmatrix}$$
+$$\Sigma = \begin{bmatrix} 5 & 0 & 0 \\ 0 & 3 & 0 \end{bmatrix}$$
+$$V^{T} = \begin{bmatrix} \frac{1}{\sqrt{2}} & \frac{1}{\sqrt{2}} & 0 \\ \frac{1}{\sqrt{18}} & \frac{-1}{\sqrt{18}} & \frac{4}{\sqrt{18}} \\ \frac{2}{3} & \frac{-2}{3} & \frac{-1}{3} \end{bmatrix}$$
+
+Thus, the SVD matrix of $A$ is: 
+
+$$ A = \begin{bmatrix} \frac{1}{\sqrt{2}} & \frac{1}{\sqrt{2}} \\ \frac{1}{\sqrt{2}} & \frac{-1}{\sqrt{2}} \end{bmatrix} \begin{bmatrix} 5 & 0 & 0 \\ 0 & 3 & 0 \end{bmatrix} \begin{bmatrix} \frac{1}{\sqrt{2}} & \frac{1}{\sqrt{2}} & 0 \\ \frac{1}{\sqrt{18}} & \frac{-1}{\sqrt{18}} & \frac{4}{\sqrt{18}} \\ \frac{2}{3} & \frac{-2}{3} & \frac{-1}{3} \end{bmatrix} $$
+
+To sum this up differently:
+
+- Step 1 & 2: Right-singular vectors as the eigenbasis of $A^{T}A$. We compute the singular values and right-singular vectors $v_{j}$ through the eigenvalue decomposition of $A^{T}A$, which is given as $A^{T}A = PDP^{T}$ where the columns of $P$ is equal to the columns of $V$ and the singular values $\sigma_{i}$ is the non-zero values of matrix $D$ converted to match the size of matrix $A$.
+- Step 3: Left-singular vectors as the normalized image of the right-singular vectors. $u_{i} = \frac{1}{\sigma_{i}}Av_{i}$ and $U = \begin{bmatrix} u_{1}, u_{2}, \ldots, u_{i} \end{bmatrix}$.
