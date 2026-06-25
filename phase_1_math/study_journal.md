@@ -169,6 +169,6 @@ where $P \in \mathbb{R}^{n \times n}$ and $D$ is a diagonal matrix whose diagona
 
 This makes solving for the eigendecomposition fairly straight forward if we are given the eigenvalues and eigenvectors of a matrix. 
 
-**Question:** What types of matrices are diagonlizable?
+**Question:** What types of matrices are diagonalizable?
 
-**Answer:** Matrices with a eigenbasis that falls in $\mathbb{R}^{n}$
+**Answer:** Matrices with a eigenbasis that falls in $\mathbb{R}^{n}$. Additionally matrices that are real symmetric matrices are always diagonalizable ($A = A^{T}$).
