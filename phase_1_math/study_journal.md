@@ -274,5 +274,9 @@ From this, we can compute the *Principal Components* $T$ by taking the SVD of $B
 
 We can also express the variance in the data by our eigenvalues. $\lambda = \sigma^{2}$. $\frac{\sum_{k=1}^{r} \lambda_{k}}{\sum_{k=1}^{n} \lambda_n}$ for $r$ modes => this gives us how many modes can be used to express the amount of variance captured by my first $r$ eigenvalues to express the variance in the data $X$. This can help us decide how many principal components we would want to keep to express x% of the variance in our data.
 
+### Friday 6/25
+
+Accidentally did day 5 for day 4 ... whoops!!!
+
 
 

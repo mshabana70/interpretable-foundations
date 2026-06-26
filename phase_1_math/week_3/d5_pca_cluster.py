@@ -1,13 +1,14 @@
 import numpy as np
 import math
 from sklearn.datasets import load_iris
+from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 
 # we can calculate PCA via eigendecomposition.
 # we should first center the data by taking mean of features and subtracting it 
 # from the original data matrix.
 
-def plot_pca(T, feature_names: list, filename="iris_pca_2D_3D.png"):
+def plot_pca(T, data, filename="iris_pca_2D_3D.png"):
     fig = plt.figure(figsize=(12, 8))
 
     # each column of the matrix T is a principal component
@@ -16,22 +17,38 @@ def plot_pca(T, feature_names: list, filename="iris_pca_2D_3D.png"):
     pc2 = T[:, 1]
     pc3 = T[:, 2]
 
-    ax1.scatter(pc1, pc2, color='red', marker='o')
+    target_names = ['setosa', 'versicolor', 'virginica']
+    for k in range(len(target_names)):
+        mask = data.target == k
+        ax1.scatter(T[mask, 0], T[mask, 1], label=target_names[k], marker='o')
+
+    # ax1.scatter(pc1, pc2, c=data.target, cmap='viridis', marker='o')
+    ax1.legend()
     ax1.set_title("2D PCA plot from Iris data")
-    ax1.set_xlabel(feature_names[0])
-    ax1.set_ylabel(feature_names[1])
+    ax1.set_xlabel('PC 1')
+    ax1.set_ylabel('PC 2')
     ax1.grid(True)
     
     ax2 = fig.add_subplot(1, 2, 2, projection='3d')
 
-    ax2.scatter(pc1, pc2, pc3, color='blue', marker='o')
+    for k in range(len(target_names)):
+        mask = data.target == k
+        ax2.scatter(T[mask, 0], T[mask, 1], T[mask, 2], label=target_names[k], marker='o')
+    
+    ax2.legend()
     ax2.set_title("3D PCA plot from Iris data")
-    ax2.set_xlabel(feature_names[0])
-    ax2.set_ylabel(feature_names[1])
-    ax2.set_zlabel(feature_names[2])
+    ax2.set_xlabel('PC 1')
+    ax2.set_ylabel('PC 2')
+    ax2.set_zlabel('PC 3')
     plt.savefig(filename)
 
-def PCA(data):
+def sci_pca(data):
+    pca = PCA(n_components=3)
+    X_pca = pca.fit_transform(data.data)
+    plot_pca(X_pca, data, filename="iris_pca_sklearn.png")
+
+
+def myPCA(data):
     # first we compute the mean-centered matrix
     # we need to take the avg of all samples across a feature, so we should parse columns
     X = data.data
@@ -78,7 +95,10 @@ def PCA(data):
 
     if np.allclose(np.abs(T), np.abs(verify_T)):
         print(f"SVD T Verified values!!!")
-        plot_pca(T, data.feature_names)
+        plot_pca(T, data)
+        
+        # verify with sklearn pca
+        sci_pca(data)
     else:
         print(f"NOT verified!!!")
 
@@ -87,7 +107,7 @@ def test():
     # grab the iris dataset
     data = load_iris()
     print(data.feature_names)
-    PCA(data)
+    myPCA(data)
 
 
 if __name__ == "__main__":
