@@ -249,3 +249,30 @@ Key thing to remember is that the function `np.linalg.eig` returns a matrix of e
 **Question:** How does SVD relate to eigendecomposition? When do you use which?
 
 **Answer:** SVD and eigendecomp are both matrix factorization techniques but SVD is a direct generalization of eigendecomposition. Eigendecomposition only really works on square matrices but SVD can work on rectangular matrices as well. 
+
+### Thursday 6/25
+
+Going over principal component analysis today...
+
+PCA is a hierarchical coordinate system (based on data) that gets the directions in your data that capture the maximum amount of variance in your data.
+
+We have a dataset $X$ where each row is a measurement from a single experiment (a data sample), and each column is features of the data. We want to capture the dominant combination of features that describe as much of the data as possible. We can do this with SVD with some extra steps.
+
+1. Compute the mean row: $\bar{x} = \frac{1}{n}\sum_{j=1}^{n}x_{j}$
+2. Compute the average matrix: we take the vector of averages and multiply it with a vector of 1's
+$$\bar{X} = \begin{bmatrix}1 \\ 1 \\ \vdots \\ 1_n\end{bmatrix} \cdot \begin{bmatrix}\bar{x}_1 & \bar{x}_2 & \cdots \bar{x}_i\end{bmatrix} \text{for features }i$$
+3. Subtract the mean (mean-centered data): $B = X - \bar{X}$
+4. Covariance Matrix of the rows of $B$. (Also known as the *Correlation Matrix* from the SVD $X^{T}X$): $C = B^{T}B$
+5. Compute the Eigendecomposition of $C$: 
+$$v_{i}B^{T}Bv_{i}$$
+$$CV = VD$$
+where $V$ is the eigenvectors of $C$ and $D$ is a diagonalized matrix of the eigenvalues of $C$. 
+
+From this, we can compute the *Principal Components* $T$ by taking the SVD of $B$, such that $T = BV = U\Sigma$ and $B = U\Sigma V^{T}$. Here the eigenvectors matrix $V$ are also called the *loadings*.
+
+> This can be a shortcut for our coding implementation! By computing the SVD of our mean-centered data $B$, we can get the principal components $T$.
+
+We can also express the variance in the data by our eigenvalues. $\lambda = \sigma^{2}$. $\frac{\sum_{k=1}^{r} \lambda_{k}}{\sum_{k=1}^{n} \lambda_n}$ for $r$ modes => this gives us how many modes can be used to express the amount of variance captured by my first $r$ eigenvalues to express the variance in the data $X$. This can help us decide how many principal components we would want to keep to express x% of the variance in our data.
+
+
+
