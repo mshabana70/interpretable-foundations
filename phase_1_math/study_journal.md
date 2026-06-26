@@ -245,3 +245,7 @@ To sum this up differently:
 After going through this example, it makes sense on how to do this on paper. But there is still a disconnect for me on how to tie this into a programmatic approach...
 
 Key thing to remember is that the function `np.linalg.eig` returns a matrix of eigenvectors as **columns** not rows.
+
+**Question:** How does SVD relate to eigendecomposition? When do you use which?
+
+**Answer:** SVD and eigendecomp are both matrix factorization techniques but SVD is a direct generalization of eigendecomposition. Eigendecomposition only really works on square matrices but SVD can work on rectangular matrices as well. 
