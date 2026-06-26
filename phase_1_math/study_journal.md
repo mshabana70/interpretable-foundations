@@ -240,3 +240,8 @@ To sum this up differently:
 
 - Step 1 & 2: Right-singular vectors as the eigenbasis of $A^{T}A$. We compute the singular values and right-singular vectors $v_{j}$ through the eigenvalue decomposition of $A^{T}A$, which is given as $A^{T}A = PDP^{T}$ where the columns of $P$ is equal to the columns of $V$ and the singular values $\sigma_{i}$ is the non-zero values of matrix $D$ converted to match the size of matrix $A$.
 - Step 3: Left-singular vectors as the normalized image of the right-singular vectors. $u_{i} = \frac{1}{\sigma_{i}}Av_{i}$ and $U = \begin{bmatrix} u_{1}, u_{2}, \ldots, u_{i} \end{bmatrix}$.
+
+
+After going through this example, it makes sense on how to do this on paper. But there is still a disconnect for me on how to tie this into a programmatic approach...
+
+Key thing to remember is that the function `np.linalg.eig` returns a matrix of eigenvectors as **columns** not rows.
