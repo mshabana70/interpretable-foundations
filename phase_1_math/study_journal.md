@@ -274,9 +274,21 @@ From this, we can compute the *Principal Components* $T$ by taking the SVD of $B
 
 We can also express the variance in the data by our eigenvalues. $\lambda = \sigma^{2}$. $\frac{\sum_{k=1}^{r} \lambda_{k}}{\sum_{k=1}^{n} \lambda_n}$ for $r$ modes => this gives us how many modes can be used to express the amount of variance captured by my first $r$ eigenvalues to express the variance in the data $X$. This can help us decide how many principal components we would want to keep to express x% of the variance in our data.
 
+**Question:** Why does PCA use the covariance matrix?
+
+**Answer:** It uses the covariance matrix because the goal of PCA is to find the directos of maximum variance in high-dim data. the Covariance matrix helps capture this mathematically.
+
 ### Friday 6/25
 
 Accidentally did day 5 for day 4 ... whoops!!!
+
+Cleaned up the graphs for day 5 and learned some matplotlib trickery.
+
+**Question:** How much variance did your first 2 components capture?
+
+**Answer:** Roughly 97% of the total data variance was captured by the first two principal components. Again, this can be calculated by $\frac{\sum_{k=1}^{r} \lambda_{k}}{\sum_{k=1}^{n} \lambda_n}$ where r is the number of components we want to use and the value returned is the variance they cover.
+
+
 
 
 
