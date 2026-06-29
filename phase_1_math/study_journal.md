@@ -13,7 +13,7 @@ Also included magnitude in there, and a shape method to work a bit like numpy.
 ### Tuesday 5/26 logs
 
 
-## Week 2
+## Week 2 - Determinants, Inverses & Solving Systems
 
 ### Monday 6/15
 
@@ -79,7 +79,7 @@ formula for cos sim: sim(v1, v2) = (v1 \dot v2) / (||v1|| * ||v2||)
 
 catching up since I am a week behind
 
-## Week 3
+## Week 3 - Eigenvalues, Eigenvectors & PCA
 
 ### Monday 6/22
 
@@ -295,6 +295,34 @@ skipped saturday this week, will circle back to it inshallah.
 ### Sunday 6/27
 
 did an extra problem on deep-ml.com for PCA implementation. Then did the 3sums leetcode problem to practice two pointer algorithms.
+
+## Week 4 - Calculus: Derivatives & the Chain Rule
+
+### Monday 6/28
+
+We need to implement numerical differentiation as a func `numerical_derivative(f, x, h=1e-7)` that approximates $\frac{df}{dx}$. 
+
+Our test conditions are $x^{2}$, $\sin{x}$, and $e^{x}$. We can compare against analytical derivatives to verify (which I'll probably just hard-code the analytical derivative for the test cases).
+
+Finite difference methods calculate the derivative $f'(x)$ at a specific point using a small step size $h$ (the distance between points):
+
+$$f'(x) \approx \frac{f(x+h) - f(x-h)}{2h}$$
+
+This is the central difference and the most accurate approximation when it comes to finite difference methods. There is also the *forward difference* and *backward difference* respectively:
+
+$$f'(x) = \frac{f(x + h) - f(x)}{h}$$
+
+$$f'(x) = \frac{f(x) - f(x - h)}{h}$$
+
+That was fairly straight forward to implement but one thing to note is I had to do a threshold equivalance for the numerical differentiation and the hardcoded derivative (since they are approximations). The threshold was diff < 1e-4
+
+**Question:** Why does `h=1e-7` work better than `h=e-15`?
+
+**Answer:** This has to do with how computer precision is calculated. If $h$ is too small of a step size, $f(x+h)$ and $f(x)$ or $f(x-h)$ become nearly identical. If we subtract these values in the numerator, this results in a loss of significant figures or a round-off error. This causes the approximation to blow out or flatline to zero. 
+
+
+
+
 
 
 
