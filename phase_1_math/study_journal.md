@@ -288,6 +288,14 @@ Cleaned up the graphs for day 5 and learned some matplotlib trickery.
 
 **Answer:** Roughly 97% of the total data variance was captured by the first two principal components. Again, this can be calculated by $\frac{\sum_{k=1}^{r} \lambda_{k}}{\sum_{k=1}^{n} \lambda_n}$ where r is the number of components we want to use and the value returned is the variance they cover.
 
+### Saturday 6/26
+
+skipped saturday this week, will circle back to it inshallah.
+
+### Sunday 6/27
+
+did an extra problem on deep-ml.com for PCA implementation. Then did the 3sums leetcode problem to practice two pointer algorithms.
+
 
 
 

@@ -50,6 +50,7 @@ def test():
 
     A1 = np.array([[3, 2, 2], [2, 3, -2]])
     A2 = np.array([[3, 2], [2, 3], [2, -2]])
+    A3 = np.array([[2, 1], [1, 2]])
 
     svd_A1 = svd(A1)
     numpy_A1 = numpy_svd_test(A1)
@@ -58,6 +59,10 @@ def test():
     svd_A2 = svd(A2)
     numpy_A2 = numpy_svd_test(A2)
     print(f"Original A: {A2}\nSVD A: {svd_A2}\nNumpy SVD A: {numpy_A2}\n")
+    
+    svd_A3 = svd(A3)
+    numpy_A3 = numpy_svd_test(A3)
+    print(f"Original A: {A3}\nSVD A: {svd_A3}\nNumpy SVD A: {numpy_A3}\n")
 
 if __name__ == "__main__":
     test()
