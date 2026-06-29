@@ -304,7 +304,7 @@ We need to implement numerical differentiation as a func `numerical_derivative(f
 
 Our test conditions are $x^{2}$, $\sin{x}$, and $e^{x}$. We can compare against analytical derivatives to verify (which I'll probably just hard-code the analytical derivative for the test cases).
 
-Finite difference methods calculate the derivative $f'(x)$ at a specific point using a small step size $h$ (the distance between points):
+**Finite difference methods** calculate the derivative $f'(x)$ at a specific point using a small step size $h$ (the distance between points):
 
 $$f'(x) \approx \frac{f(x+h) - f(x-h)}{2h}$$
 
