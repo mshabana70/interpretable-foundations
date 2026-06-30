@@ -330,6 +330,8 @@ Using a tree structure where each op has leaves. The ops pass the expressions on
 
 I used claude to generate the `test()` func because I was lazy ...
 
+This program is complete! Need to review this throughout the week.
+
 
 
 
