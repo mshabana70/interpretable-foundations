@@ -320,6 +320,12 @@ That was fairly straight forward to implement but one thing to note is I had to 
 
 **Answer:** This has to do with how computer precision is calculated. If $h$ is too small of a step size, $f(x+h)$ and $f(x)$ or $f(x-h)$ become nearly identical. If we subtract these values in the numerator, this results in a loss of significant figures or a round-off error. This causes the approximation to blow out or flatline to zero. 
 
+### Tuesday 6/29
+
+A bit lost on how to do the OOD design of this...
+
+Will try to start simple by creating an `Add` sub-class that evaluates, differentiates, and just has a string output when printed. 
+
 
 
 
