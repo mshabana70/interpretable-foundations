@@ -326,8 +326,9 @@ A bit lost on how to do the OOD design of this...
 
 Will try to start simple by creating an `Add` sub-class that evaluates, differentiates, and just has a string output when printed. 
 
+Using a tree structure where each op has leaves. The ops pass the expressions on to the children to gather values from `feed_dict`. 
 
-
+I used claude to generate the `test()` func because I was lazy ...
 
 
 
