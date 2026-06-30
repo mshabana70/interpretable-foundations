@@ -332,6 +332,10 @@ I used claude to generate the `test()` func because I was lazy ...
 
 This program is complete! Need to review this throughout the week.
 
+**Question:** How does the chain rule work as "multiplication of local stretching factors"?
+
+**Answer:** Because the chain rule states that the derivative of a composite function is the product of the derivatives of its outer and inner functions. Visually, this is how much the inner function stretches the input space, multiplied by how much the outer function stretches the intermediate result. 
+
 
 
 
