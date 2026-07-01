@@ -21,6 +21,12 @@ class Expression():
 
     def __radd__(self, other):
         return Add(self._wrap(other), self)
+
+    def __mul__(self, other):
+        return Multiply(self, self._wrap(other))
+
+    def __rmul__(self, other):
+        return Multiply(self._wrap(other), self)
     
     def __pow__(self, power):
         return Power(self, self._wrap(power))
@@ -107,6 +113,21 @@ class Exp(Expression):
     def __str__(self):
         return f"exp({self.expr})"
 
+class Ln(Expression):
+    def __init__(self, expr):
+        super().__init__(None)
+        self.expr = expr
+    
+    def evaluate(self, feed_dict=None):
+        return math.log(self.expr.evaluate(feed_dict))
+    
+    def diff(self, var):
+        # d/dx(ln(x)) = 1/x * d/dx
+        return Multiply(Power(self.expr, Constant(-1.0)), self.expr.diff(var))
+    
+    def __str__(self):
+        return f"ln({self.expr})"
+
 # binary ops
 
 class Add(Expression):
@@ -152,16 +173,20 @@ class Power(Expression):
         return self.base.evaluate(feed_dict) ** self.exponent.evaluate(feed_dict)
     
     def diff(self, var):
-        exp_val = self.exponent.evaluate()
-
-        # power rule => d/dx(u^n) = n * u^(n-1) * du/dx
-        return Multiply(
-            Constant(exp_val),
-            Multiply(
-                Power(self.base, Constant(exp_val - 1)),
-                self.base.diff(var)
+        if isinstance(self.exponent, Constant):
+            exp_val = self.exponent.value
+            # power rule => d/dx(u^n) = n * u^(n-1) * du/dx 
+            return Multiply(
+                Constant(exp_val),
+                Multiply(
+                    Power(self.base, Constant(exp_val - 1)),
+                    self.base.diff(var)
+                )
             )
-        )
+        else:
+            # handling the case where the exponent is a Variable type
+            # we can do that with log differentiation => d/dx(u^v) = d/dx(e^{v * ln(u)})
+            return Exp(Multiply(self.exponent, Ln(self.base))).diff(var) 
     
     def __str__(self):
         return f"({self.base} ** {self.exponent})"
@@ -178,6 +203,8 @@ def test():
         ("x^2 + sin(x) (sum rule)",    Add(Power(x, Constant(2.0)), Sin(x)),   1.1),
         ("x * cos(x)   (product)",     Multiply(x, Cos(x)),                    0.9),
         ("exp(sin(x))  (chain rule)",  Exp(Sin(x)),                            0.4),
+        ("x^x  (log diff rule)",       Power(x, x),                            2.0),
+        ("x^3x  (log diff rule)",      Power(x, Multiply(Constant(3.0), x)),   0.8),
     ]
 
     for label, expr, point in cases:

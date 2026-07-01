@@ -336,6 +336,17 @@ This program is complete! Need to review this throughout the week.
 
 **Answer:** Because the chain rule states that the derivative of a composite function is the product of the derivatives of its outer and inner functions. Visually, this is how much the inner function stretches the input space, multiplied by how much the outer function stretches the intermediate result. 
 
+**Update:** I decided to try to handle the case where we differentiate a power expression whose exponent is a type `Variable`. This requires a different approach than if `Power().exponent` was a type `Constant`. Since we are doing differentiation of two functions $f(x)^{g(x)}$, we can define it in a new format using *log differentiation*:
+
+$$u = f(x); v = g(x)$$
+$$\frac{d}{dx}(u^{v}) = \frac{d}{dx}(e^{v\cdot ln(u)})$$
+
+So we can set a condition in `Power().diff()` that checks the instance of our `self.exponent`. If it is a `Constant` type, we just apply the power rule. 
+
+If `self.exponent` is anything other than a `Constant` type (since it is not a `Constant`, we just place it in an else block), then we apply the log differentiation rule.
+
+Also, one note to add, I used Monday's numerical differentiation approximation to test how accurate the symbolic derivatives that we implemented today. 
+
 
 
 
