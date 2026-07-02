@@ -12,7 +12,7 @@ def compute_gradient(func, points, h=1e-7):
         # this is the center diff method
         f_plus = func(points + e)
         f_minus = func(points - e)
-        grad[i] = (f_plus - f_minus) / 2 * h
+        grad[i] = (f_plus - f_minus) / (2 * h)
     
     return grad
 
@@ -22,11 +22,24 @@ def test_func_1(points):
     y = points[1]
     return (x ** 2) + (3 * x * y) + (y ** 2)
 
+
+def test_func_2(points):
+    # f(x, y) = x^2 + 3y + z^2
+    x = points[0]
+    y = points[1]
+    z = points[2]
+    return (x ** 2) + (3* y) + (z ** 2)
+
 def test():
     # need to test f(x, y) = x^2 + 3xy + y^2
     points_1 = np.array([1.0, 2.0])
     gradient_1 = compute_gradient(test_func_1, points_1)
     print(f"The gradient vector of f(x, y) = x^2 + 3xy + y^2 is {gradient_1}")
+
+    points_2 = np.array([1.0, 2.0, 3.0])
+    gradient_2 = compute_gradient(test_func_2, points_2)
+    print(f"The gradient vector of f(x, y, z) = x^2 + 3y + z^2 is {gradient_2}")
+    
 
 if __name__ == "__main__":
     test()
