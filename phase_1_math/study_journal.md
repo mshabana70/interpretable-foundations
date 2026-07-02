@@ -460,5 +460,9 @@ $$
 
 Little side note, numpy's `zeros_like()` takes the array you want to match and can define the datatype for the zeros array. `zeros()` needs a tuple of the shape of the zeros array you want to create. 
 
+**Question:** When do you need the Jacobian vs just the gradient?
+
+**Answer:** The jacobian is useful when differentiation a vector-valued function on a vector of variables. The gradient can be computed only when you are dealing with a function that maps the $\mathbb{R}^2 \to \mathbb{R}$.
+
 
 
