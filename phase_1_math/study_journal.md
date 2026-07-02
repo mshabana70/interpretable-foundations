@@ -363,7 +363,102 @@ Here $e_{i}$ is the standard unit vector for dim $i$.
 
 **Answer:** A gradient is a measure of steepness, incline, or decline a line. It indicate how much a line moves vertically for every unit it moves horizontally.
 
+### Thursday 7/2
 
+Going through the "Mathematics for Machine Learning" book for this task today. Specifically section 5.1-5.3.
+
+Definition of the *Taylor Polynomial* of degree $n$ for $f : \mathbb{R} \to \mathbb{R}$ at $x_{0}$ is defined as:
+
+$$T_{n}(x) := \sum_{k=0}^{n} \frac{f^{(k)}(x_{0})}{k!}(x - x_{0})^{k},$$
+
+where $f^{(k)}(x_{0})$ is the $k$th derivative of $f$ at $x_{0}$ (which we assume exists in this case) and $\frac{f^{(k)}(x_{0})}{k!}$ are coefficients of the polynomial.
+
+For a continuous function $f \in \mathcal{C}^{\infty}$ ($\mathcal{C}$ is the set of continuous differentiable functions), we can define the *Taylor Series* as:
+
+$$T_{\infty}(x) := \sum_{k=0}^{\infty} \frac{f^{(k)}(x_{0})}{k!}(x - x_{0})^{k},$$
+
+Taylor series is a special case of *power series*:
+
+$$f(x) = \sum_{k=0}^{\infty}a_{k}(x - c)^{k}$$
+
+where $a_{k}$ are coefficients and $c$ is a constant. 
+
+Important differentiation rules to keep in mind:
+
+- **Product Rule:** $(f(x)g(x))' = f'(x)g(x) + f(x)g'(x)$
+- **Quotient Rule:** $\left( \frac{f(x)}{g(x)} \right)' = \frac{f'(x)g(x) - f(x)g'(x)}{(g(x))^{2}}$
+- **Sum Rule:** $(f(x) + g(x))' = f'(x) + g'(x)$
+- **Chain Rule:** $(g(f(x)))' = (g \circ f)'(x) = g'(f(x))f'(x)$
+
+$g \circ f$ means function composition $x \mapsto f(x) \mapsto g(f(x))$.
+
+As covered yesterday, when $f$ depends on one or more variables $x \in \mathbb{R}^{n}$ (like $f(\textbf{x}) = f(x_{1}, x_{2})$). The generalization of the derivative to functions of several variables is the *gradient*.
+
+We find the gradient of the function $f$ with respect to $x$ by *varying one variable at a time* and keeping the others constant. The gradient is then the collection of these *partial derivatives*
+
+For a function $f : \mathbb{R}^{n} \to \mathbb{R}$, $x \mapsto f(\textbf{x})$, $\textbf{x} \in \mathbb{R}^{n}$ of $n$ variables $x_{1}, \ldots, x_{n}$ we define the *partial derivatives* as
+
+$$
+\begin{align*}
+\frac{\partial f}{\partial x_{1}} &= \lim_{h \to 0}\frac{f(x_{1} + h, x_{2}, \ldots, x_{n}) - f(\textbf{x})}{h} \\
+\vdots \\
+\frac{\partial f}{\partial x_{n}} &= \lim_{h \to 0}\frac{f(x_{1},\ldots,x_{n-1},x_{n} + h) - f(\textbf{x})}{h}
+\end{align*}
+$$
+
+an collect them in the row vector
+$$
+\nabla_{\textbf{x}}f = \text{grad}f = \frac{df}{d\textbf{x}} = \begin{bmatrix} \frac{\partial f(\textbf{x})}{\partial x_{1}} &  \frac{\partial f(\textbf{x})}{\partial x_{2}} & \ldots & \frac{\partial f(\textbf{x})}{\partial x_{n}}\end{bmatrix} \in \mathbb{R}^{1 \times n}
+$$
+
+here $n$ is the number of variables and 1 is the dimension of the image/codomain of $f$ (the function value dimension of $f(\textbf{x})$)
+
+Vector $\textbf{x}$ is a row vector, the same row vector we used in the "$\nabla_{\textbf{x}} f$" formula above. This is the *gradient of $f$*, also known as the *Jacobian*. 
+
+> NOTE: This definition of the Jacobian is a special case of the general Jacobian.
+
+Basic rules of partial differentiation:
+
+- **Product Rule:** $\frac{\partial}{\partial \textbf{x}}(f(\textbf{x})g(\textbf{x})) = \frac{\partial f}{\partial \textbf{x}}g(\textbf{x}) + f(\textbf{x})\frac{\partial g}{\partial \textbf{x}}$
+- **Sum Rule:** $\frac{\partial}{\partial \textbf{x}}(f(\textbf{x}) + g(\textbf{x})) = \frac{\partial f}{\partial \textbf{x}} + \frac{\partial f}{\partial \textbf{x}}$
+- **Chain Rule:** $\frac{\partial}{\partial \textbf{x}}(g(f(\textbf{x}))) = \frac{\partial}{\partial \textbf{x}}(g \circ f)(\textbf{x}) = \frac{\partial g}{\partial f}\frac{\partial f}{\partial \textbf{x}}$
+
+Let's generalize this to vector-valued functions $\textbf{f} : \mathbb{R}^{n} \to \mathbb{R}^{m}$ where $n \geq 1$ and $m > 1$. For $\textbf{f} : \mathbb{R}^{n} \to \mathbb{R}^{m}$ and a vector $\textbf{x} = [x_{1},\ldots, x_{n}]^{\top} \in \mathbb{R}^{n}$, the corresponding vector of function values is 
+
+$$\textbf{f}(\textbf{x}) = \begin{bmatrix} f_{1}(\textbf{x}) \\ \vdots \\ f_{m}(\textbf{x})\end{bmatrix} \in \mathbb{R}^{m}$$
+
+"Writing the vector-valued function this way allows us to view a vector-valued function $\textbf{f} : \mathbb{R}^{n} \to \mathbb{R}^{m}$ as a vector of functions $[ f_1, \ldots , f_m]^{\top}$, $f_{i} : \mathbb{R}^{n} \to \mathbb{R}$ that map onto $\mathbb{R}$."
+
+The partial derivative of a vector-valued function $\textbf{f} : \mathbb{R}^{n} \to \mathbb{R}^{m}$ with respect to $x_{i} \in \mathbb{R}, i = 1, \ldots, n$ is given as a vector
+
+$$
+\frac{\partial \textbf{f}}{\partial x_{i}} = \begin{bmatrix} \frac{\partial f_1}{\partial x_{i}} \\ \vdots \\ \frac{\partial f_m}{\partial x_{i}}\end{bmatrix} = \begin{bmatrix}\lim_{h \to 0} \frac{f_1(x_1, \ldots, x_{i-1}, x_{i} + h, x_{i+1}, \ldots, x_{n}) - f_1(\textbf{x})}{h} \\ \vdots \\ \lim_{h \to 0}\frac{f_m(x_1, \ldots, x_{i-1}, x_{i} + h, x_{i+1}, \ldots, x_{n}) - f_m(\textbf{x})}{h}\end{bmatrix} \in \mathbb{R}^{m}
+$$
+
+From our earlier definition of $\nabla_{\textbf{x}}f$, we know that the gradient of $\textbf{f}$ with respect to a vector is the row vector of the partial derivatives. In our above equation, every partial deriative $\frac{\partial \textbf{f}}{\partial x_{i}}$ is itself a column vector. Therefore:
+
+$$
+\begin{align*}
+\frac{d\textbf{f}}{d\textbf{x}} &= \begin{bmatrix} \boxed{\frac{\partial \textbf{f}(\textbf{x})}{\partial x_{1}}} & \cdots & \boxed{\frac{\partial \textbf{f}(\textbf{x})}{\partial x_{n}}}\end{bmatrix} \\
+&= \begin{bmatrix} \boxed{\begin{matrix} \frac{\partial f_1(\textbf{x})}{\partial x_{1}} \\ \vdots \\ \frac{\partial f_m(\textbf{x})}{\partial x_{1}}\end{matrix}} & \cdots & \boxed{\begin{matrix} \frac{\partial f_1(\textbf{x})}{\partial x_{n}} \\ \vdots \\ \frac{\partial f_m(\textbf{x})}{\partial x_{n}}\end{matrix}} \end{bmatrix} \in \mathbb{R}^{m \times n}
+\end{align*}
+$$
+
+NOW for the **Jacobian**: The collection of all first-order partial derivatives of a vector-valued function $\textbf{f}: \mathbb{R}^{n} \to \mathbb{R}^{m}$. The Jacobian $\textbf{J}$ is an $m \times n$ matrix, which we can define as:
+
+$$
+\begin{align*}
+
+\textbf{J} &= \nabla_{\textbf{x}}\textbf{f} = \frac{d\textbf{f(\textbf{x})}}{d\textbf{x}} = \begin{bmatrix} \frac{\partial \textbf{f}(\textbf{x})}{\partial x_{1}} & \cdots & \frac{\partial \textbf{f}(\textbf{x})}{\partial x_{n}}\end{bmatrix} \\
+
+&= \begin{bmatrix} \frac{\partial f_1(\textbf{x})}{\partial x_{1}} & \cdots & \frac{\partial f_1(\textbf{x})}{\partial x_{n}} \\ \vdots &  & \vdots \\ \frac{\partial f_m(\textbf{x})}{\partial x_{1}} & \cdots &  \frac{\partial f_m(\textbf{x})}{\partial x_{n}}\end{bmatrix}, \\ 
+
+\textbf{x} &= \begin{bmatrix} x_1 \\ \vdots \\ x_{n} \end{bmatrix}, \space\space\space\space J(i, j) = \frac{\partial f_{i}}{\partial x_{j}}.
+
+\end{align*}
+$$
+
+Little side note, numpy's `zeros_like()` takes the array you want to match and can define the datatype for the zeros array. `zeros()` needs a tuple of the shape of the zeros array you want to create. 
 
 
 
