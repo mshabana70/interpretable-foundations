@@ -292,13 +292,13 @@ Cleaned up the graphs for day 5 and learned some matplotlib trickery.
 
 skipped saturday this week, will circle back to it inshallah.
 
-### Sunday 6/27
+### Sunday 6/28
 
 did an extra problem on deep-ml.com for PCA implementation. Then did the 3sums leetcode problem to practice two pointer algorithms.
 
 ## Week 4 - Calculus: Derivatives & the Chain Rule
 
-### Monday 6/28
+### Monday 6/29
 
 We need to implement numerical differentiation as a func `numerical_derivative(f, x, h=1e-7)` that approximates $\frac{df}{dx}$. 
 
@@ -320,7 +320,7 @@ That was fairly straight forward to implement but one thing to note is I had to 
 
 **Answer:** This has to do with how computer precision is calculated. If $h$ is too small of a step size, $f(x+h)$ and $f(x)$ or $f(x-h)$ become nearly identical. If we subtract these values in the numerator, this results in a loss of significant figures or a round-off error. This causes the approximation to blow out or flatline to zero. 
 
-### Tuesday 6/29
+### Tuesday 6/30
 
 A bit lost on how to do the OOD design of this...
 
@@ -346,6 +346,18 @@ So we can set a condition in `Power().diff()` that checks the instance of our `s
 If `self.exponent` is anything other than a `Constant` type (since it is not a `Constant`, we just place it in an else block), then we apply the log differentiation rule.
 
 Also, one note to add, I used Monday's numerical differentiation approximation to test how accurate the symbolic derivatives that we implemented today. 
+
+### Wednesday 7/1
+
+We need to compute the gradient of a multivariable function. We can do this with the *finite difference method* as we did for the univariable function on monday.
+
+For the *central difference method* of a multivariable function:
+
+$$\nabla f(\textbf{x}) = \begin{bmatrix} \frac{\partial f}{\partial x_1} \\ \frac{\partial f}{\partial x_2} \\ \frac{\partial f}{\partial x_3} \\ \vdots \\ \frac{\partial f}{\partial x_n} \end{bmatrix}$$
+
+$$\frac{\partial f}{\partial x_i} \approx \frac{f(\textbf{x} + he_{i}) - f(\textbf{x} - he_{i})}{2h}$$
+
+Here $e_{i}$ is the standard unit vector for dim $i$.
 
 
 
