@@ -359,6 +359,9 @@ $$\frac{\partial f}{\partial x_i} \approx \frac{f(\textbf{x} + he_{i}) - f(\text
 
 Here $e_{i}$ is the standard unit vector for dim $i$.
 
+**Question:** What is a gradient geometrically?
+
+**Answer:** A gradient is a measure of steepness, incline, or decline a line. It indicate how much a line moves vertically for every unit it moves horizontally.
 
 
 
