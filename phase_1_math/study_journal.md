@@ -464,5 +464,9 @@ Little side note, numpy's `zeros_like()` takes the array you want to match and c
 
 **Answer:** The jacobian is useful when differentiation a vector-valued function on a vector of variables. The gradient can be computed only when you are dealing with a function that maps the $\mathbb{R}^2 \to \mathbb{R}$.
 
+### Friday 7/3
 
+The algo for gradient descent:
+
+$$x^{(k+1)} = x^{(k)} - \alpha \nabla_{x}f(x^{(k)}$$
 
