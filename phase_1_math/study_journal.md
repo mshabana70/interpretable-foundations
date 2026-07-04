@@ -470,3 +470,13 @@ The algo for gradient descent:
 
 $$x^{(k+1)} = x^{(k)} - \alpha \nabla_{x}f(x^{(k)}$$
 
+Here, we start with an initial point for $x$ and set it to the value of $x^{(k)}$. Then, calculate the gradient of our function $f(x)$ with respect to $x^{(k)}$ and multiply it with a step size or *learning rate* to scale our update magnitude. This helps us avoid overshooting any minimum we descend to.
+
+Once we calculate this gradient, we take the learning rate - gradient product and subtract it from the value of $x^{(k)}$ (our current position on the function). This gives us a *descent* to a new point (descending because we subtract the gradient value, going down the slop of at the $x^{(k)}$ ). This gives us the new point $x^{(k+1)}$. Now we have moved from our original position on the graph and need to repeat this process by resetting the value of $x^{(k)}$ to $x^{(k+1)}$. 
+
+For a stopping condition, I decided to measure the update distance between $x^{(k)}$ and $x^{(k+1)}$. This can inform us that whenever we are moving by a very small distance, we have reached a minimum of the function $f(x)$. This obviously doesn't tell us the difference on whether we found a local or global minimum so there is improvement to be had here.
+
+**Question:** Did gradient descent find the global minimum? Why or why not?
+
+**Answer:** Our example did find the global minimum, but that was because we chose a good point on the graph for our initial value of $x^{(k)}$. If we chose $x^{(k)} = [3.5, 5.0]$, we would fall into a local minimum farrrr from the global (just a local ridge due to $2\sin(xy)$). 
+
