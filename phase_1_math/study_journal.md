@@ -480,3 +480,17 @@ For a stopping condition, I decided to measure the update distance between $x^{(
 
 **Answer:** Our example did find the global minimum, but that was because we chose a good point on the graph for our initial value of $x^{(k)}$. If we chose $x^{(k)} = [3.5, 5.0]$, we would fall into a local minimum farrrr from the global (just a local ridge due to $2\sin(xy)$). 
 
+## Week 5 - Review Week
+
+### Wednesday 7/8
+
+Not too much to note this day. Just implemented Linear regression which wasn't too bad and redid gradient descent from memory with some look up on cost functions. 
+
+One thing to note about least squares approximation:
+
+You need to preprend a column of 1s to the feature matrix X so that you can actually do the $(X^{\top}X)^{-1}$ operation, as well as calculate a bias term from least squares.
+
+Otherwise you will get a no-op error from numpy for doing the inverse of a scalar (since numpy does not tell the difference between a row and column when it comes to 1-D arrays).
+
+Fixing this with `column_stack()` led to the two correct values for bias and weight.
+

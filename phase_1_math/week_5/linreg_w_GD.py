@@ -34,7 +34,7 @@ def linreg_GD(X, y, alpha=1e-2):
 
         # use derivative of func and of weight
         new_error_rate = MSE(y_pred, y)
-        print(f"Current error: {new_error_rate}")
+        #print(f"Current error: {new_error_rate}")
 
         # update our weight and bias
         weight_new = weight - (alpha * grad_weight(y_pred, y, X))
@@ -43,22 +43,31 @@ def linreg_GD(X, y, alpha=1e-2):
         weight = weight_new
         bias = bias_new
     
+    least_weight, least_bias = linreg_normal(X, y)
     # now we can plot the result (best fit line)
     plt.scatter(X, y, color='b')
-    plt.plot(X, (weight * X + bias), color='r', linewidth=2, label=f"Fit: y = {weight:.2f}x + {bias:.2f}")
+    plt.plot(X, (weight * X + bias), color='r', linewidth=2, label=f"GD Fit: y = {weight:.2f}x + {bias:.2f}")
+    plt.plot(X, (least_weight * X + least_bias), color='green', linewidth=2, label=f"LS Fit: y = {least_weight:.2f}x + {least_bias:.2f}")
     plt.xlabel("Years of Experience")
     plt.ylabel("Salary")
-    plt.title("Linear Regression using Gradient Descent")
+    plt.title("Linear Regression w/ Gradient Descent vs. Least Squares Approximation")
     plt.legend()
-    plt.savefig('lingreg_best_fit.png')
+    plt.savefig('lingreg_gd_ls.png')
     print(f"Generated plot of Linear Regression with Gradient Descent.")
     
-def linreg_normal(X, y):
+def linreg_normal(X_data, y):
 
     # normal equation: (X^{T}X)^{-1}X^{T}y
-    weights = np.linalg.inv(X.T @ X) @ X.T @ y
-    print(f"Weights from normal equation: {weights}")
 
+    # we need to stack a column of ones to our vector X so that:
+    # 1. we can actually do the dot product op
+    # 2. Have a column that represents the bias, so we get back two values, not just weights.
+    X = np.column_stack((np.ones(len(X_data)), X_data))
+
+    bias, weight = np.linalg.inv(X.T @ X) @ X.T @ y
+    
+    # great! Now we have two values, the first being the bias, the second being the scalar weight value. Now we can plot
+    return weight, bias
     
 
 
@@ -77,7 +86,7 @@ def test_salary():
     y = df['Salary'].to_numpy()
 
     # now we pass it to our linreg model
-    print(f"Running Linear Regression with Gradient Descent...")
+    print(f"Running Linear Regression with Gradient Descent and Least Squares Approximation...")
     linreg_GD(X, y)
 
 if __name__ == "__main__":
