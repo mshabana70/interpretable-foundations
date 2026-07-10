@@ -494,3 +494,5 @@ Otherwise you will get a no-op error from numpy for doing the inverse of a scala
 
 Fixing this with `column_stack()` led to the two correct values for bias and weight.
 
+Optional thing to do here: Standardize X using *z-score normalization* to improve the speed of GD convergence. Essential restructure X to be a mean of 0 and have all values of the X be in terms of standard deviations from the mean. 
+

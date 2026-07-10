@@ -1,0 +1,22 @@
+[project]
+name = "interpretable-foundations"
+version = "0.1.0"
+description = "Study Guide for AI Safety Foundations"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "numpy",
+    "matplotlib",
+    "pandas",
+    "scikit-learn",
+    "torch",
+    "kagglehub",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["interpretable-foundations"]
+
