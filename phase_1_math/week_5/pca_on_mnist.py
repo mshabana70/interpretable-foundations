@@ -14,13 +14,7 @@ def import_mnist():
 def custom_pca(X, num_components=2):
 
     # we need to compute the mean-centered data matrix B
-    col_means = X.mean(axis=0)
-    col_means = np.array([col_means]) # (1, 784)
-    
-    # need to broadcast the row averages so it matches shape of X
-    X_bar = np.repeat(col_means, len(X), axis=0)
-
-    B = X - X_bar 
+    B = X - X.mean(axis=0) 
     
     # # quick sanity check
     # print("Original Matrix: ", X[:5])
@@ -40,8 +34,6 @@ def custom_pca(X, num_components=2):
 
     print(f"First few eigenvalues: {sorted_eigenvals[:10]}")
     V = sorted_eigenvecs.T
-
-    D = np.diag(sorted_eigenvals)
 
     # now we get the principal components
     T = B @ V
