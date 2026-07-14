@@ -504,6 +504,9 @@ $$\nabla f(x,y) = \left[\ \frac{\partial f}{\partial x},\ \frac{\partial f}{\par
 
 $$x \leftarrow x - \alpha,\frac{\partial f}{\partial x}, \qquad y \leftarrow y - \alpha,\frac{\partial f}{\partial y}$$
 
+**Question:** How does learning rate affect convergence?
+
+**Answer:** Extremely small LRs make convergence incredibly slow and inefficient. However, if the LR is too large then you could overshoot the global minimum search and oscillate forever, causing a failure in convergence.
 
 ## Week 6 - Probability & Statistics for ML
 

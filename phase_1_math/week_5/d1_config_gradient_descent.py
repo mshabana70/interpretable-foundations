@@ -1,5 +1,8 @@
 import math
 import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.colors import LogNorm
+from matplotlib.collections import LineCollection
 
 # reimplementing symbolic differentiation
 
@@ -244,8 +247,43 @@ class GradientDescent():
         elif t == n_iters and check_step_size > tol:
             print(f"GD failed to converge... Stuck at {self.step_history[-1]} at step {t}")
     
-    def plot(self):
-        pass
+    def plot(self, ax=None, path_color="#ff9500", label=None, draw_field=True):
+        traj = np.array(self.step_history)
+        xs, ys = traj[:, 0], traj[:, 1]
+
+        if ax is None:
+            _, ax = plt.subplots(figsize=(7.5, 6))
+        
+        if draw_field:
+            pad = 0.5
+            gx = np.linspace(xs.min() - pad, xs.max() + pad, 400)
+            gy = np.linspace(ys.min() - pad, ys.max() + pad, 400)
+            GX, GY = np.meshgrid(gx, gy)
+            a, b = 2.0, 100.0
+            Z = ((a - GX) ** 2) + (b * (GY - GX ** 2)**2)
+            levels = np.logspace(-1, 3.5, 25)
+            ax.contourf(GX, GY, Z, levels=levels, norm=LogNorm(), cmap="viridis", alpha=0.9)
+            ax.plot(2.0, 4.0, "*", color="gold", mec="black", ms=18, label="minimum (2, 4)")
+        
+        pts  = traj.reshape(-1, 1, 2)
+        segs = np.concatenate([pts[:-1], pts[1:]], axis=1)
+        lc = LineCollection(segs, cmap="autumn", array=np.arange(len(segs)), lw=1.6)
+        ax.add_collection(lc)
+        ax.plot(xs[0], ys[0], "o", color="white", mec="black", ms=8)   # start
+        ax.set_xlabel("x"); ax.set_ylabel("y")
+        ax.set_title("Gradient descent trajectory on Rosenbrock")
+        ax.legend(loc="upper left", framealpha=0.9)
+        return ax
+    
+    def plot_convergence(self, ax=None, color="#ff9500", label=None):
+        traj = np.array(self.step_history)
+        fx = (2.0 - traj[:,0])**2 + 100.0*(traj[:,1] - traj[:,0]**2)**2
+        if ax is None: _, ax = plt.subplots()
+        ax.semilogy(fx, color=color, label=label)          # <-- semilogy, not plot
+        ax.set_xlabel("iteration"); ax.set_ylabel("f(x, y)  (log)")
+        ax.legend(); ax.grid(alpha=0.3)
+        return ax
+        
 
 if __name__ == "__main__":
 
@@ -258,14 +296,23 @@ if __name__ == "__main__":
     # Rosenbrock func => f(x, y) = (a - x)^2 + b(y - x^2)^2
     rosenbrock_func = Add(Power(Add(Constant(a), Multiply(Constant(-1.0), x)) ,Constant(2.0)), Multiply(Constant(b), Power(Add(y, Multiply(Constant(-1.0), Power(x, Constant(2.0)))), Constant(2.0))))
 
+    
+    # define gradient descent objects
     feed_dict1 = {"x": -1.5, "y": 1.5}
-    # define gradient descent object
-    gd = GradientDescent(function=rosenbrock_func, feed_dict=feed_dict1)
+    plain = GradientDescent(rosenbrock_func, {"x": -1.5, "y": 1.5})
+    plain.run(beta=0.0, n_iters=20000)
 
-    # run gradient descent
-    gd.run(beta=0.0, n_iters=10000)
+    mom = GradientDescent(rosenbrock_func, {"x": -1.5, "y": 1.5})
+    mom.run(beta=0.9, n_iters=20000)
 
-    gd.run(beta=0.9, n_iters=10000)
+    # Figure 1 — trajectory (shared spatial axes)
+    ax_traj = plain.plot(path_color="#ff4d4d", label="Beta = 0.0")
+    mom.plot(ax=ax_traj, path_color="#ff9500", label="Beta = 0.9", draw_field=False)
+    ax_traj.figure.savefig("rosenbrock_GD_trajectory.png", dpi=130)
 
+    # Figure 2 — convergence (its OWN iteration–loss axes; do NOT pass ax_traj)
+    ax_conv = plain.plot_convergence(color="#ff4d4d", label="Beta = 0.0")
+    mom.plot_convergence(ax=ax_conv, color="#ff9500", label="Beta = 0.9")
+    ax_conv.figure.savefig("rosenbrock_GD_convergence.png", dpi=130)
 
         
