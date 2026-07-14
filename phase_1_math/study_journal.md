@@ -496,6 +496,15 @@ Fixing this with `column_stack()` led to the two correct values for bias and wei
 
 Optional thing to do here: Standardize X using *z-score normalization* to improve the speed of GD convergence. Essential restructure X to be a mean of 0 and have all values of the X be in terms of standard deviations from the mean. 
 
+## Week 5: Multivariable Calculus & Optimization 
+
+### Monday 7/13
+
+$$\nabla f(x,y) = \left[\ \frac{\partial f}{\partial x},\ \frac{\partial f}{\partial y}\ \right]\Bigg|_{(x,y)}$$
+
+$$x \leftarrow x - \alpha,\frac{\partial f}{\partial x}, \qquad y \leftarrow y - \alpha,\frac{\partial f}{\partial y}$$
+
+
 ## Week 6 - Probability & Statistics for ML
 
 ### Monday 7/13

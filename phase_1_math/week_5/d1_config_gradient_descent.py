@@ -20,14 +20,14 @@ class Expression():
     def __add__(self, other):
         return Add(self, self._wrap(other))
     
-    def _radd(self, other):
+    def __radd__(self, other):
         return Add(self._wrap(other), self)
 
     def __mul__(self, other):
         return Multiply(self, self._wrap(other))
     
     def __rmul__(self, other):
-        return Mulitply(self._wrap(other), self)
+        return Multiply(self._wrap(other), self)
     
     def __pow__(self, power):
         return Power(self, self._wrap(power))
@@ -191,34 +191,51 @@ class Power(Expression):
 
 class GradientDescent():
 
-    def __init__(self, function, input):
+    def __init__(self, function, feed_dict):
         self.function = function
-        self.input = input
-        self.step_history = [self.input[0]]
+        self.inputs = list(feed_dict.values()) # should be a list of floats
+        self.variables = list(feed_dict.keys()) # should be a list of strings
+        self.step_history = []
 
     def derive(self):
-        return self.function.diff(self.input)
+        self.partials = []
+        for var in self.variables:
+            # we are calculating the partial derivatives upfront for every variable in function
+            # and storing the partials in a list to eval against in our grad loop
+            self.partials.append(self.function.diff(var))
+        return self.partials
     
     def run(self, alpha=0.001, beta=0.9, decay=0.0, n_iters=1000, tol=1e-6):
         """
         Returns the trajectory (list of points) so we can plot convergence.
         """
 
-        x0 = self.input[0]
-        momentum = np.zeros_like(x0)
-        tol_test = x0
-        diff_func_symbol = self.derive()
+        x0 = self.inputs[0]
+        y0 = self.inputs[1]
+        points = np.array([x0, y0])
+
+        momentum = np.zeros_like(points)
+        tol_test = points
+        partial_derivatives = self.derive()
+        dfdx = partial_derivatives[0]
+        dfdy = partial_derivatives[1]
+
+        self.step_history.append(points)
         t = 0
-        while abs(np.linalg.norm(tol_test)) < tol:
-            grad = diff_func_symbol.evaluate(x0)
+
+        while (abs(np.linalg.norm(tol_test)) > tol) or t < n_iters:
+            
+            grad = np.array([
+                dfdx.evaluate({self.variables[0]: points[0], self.variables[1]: points[1]}),
+                dfdy.evaluate({self.variables[0]: points[0], self.variables[1]: points[1]})
+            ])
             alpha_t = alpha / (1 + decay*t)
             momentum = beta*momentum - alpha_t*grad
-            x = x0 + momentum
+            points = points + momentum
 
             # updates
-            self.step_history.append(x)
-            tol_test = x0 - x
-            x0 = x
+            self.step_history.append(points)
+            tol_test = self.step_history[-2] - self.step_history[-1]
             t += 1
 
         print(f"Convergence achieved at {self.step_history[-1]}")
