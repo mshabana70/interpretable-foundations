@@ -193,6 +193,7 @@ class GradientDescent():
 
     def __init__(self, function, feed_dict):
         self.function = function
+        self.feed_dict = feed_dict
         self.inputs = list(feed_dict.values()) # should be a list of floats
         self.variables = list(feed_dict.keys()) # should be a list of strings
         self.step_history = []
@@ -210,38 +211,61 @@ class GradientDescent():
         Returns the trajectory (list of points) so we can plot convergence.
         """
 
-        x0 = self.inputs[0]
-        y0 = self.inputs[1]
-        points = np.array([x0, y0])
+        points = np.array(self.inputs)
 
         momentum = np.zeros_like(points)
         tol_test = points
         partial_derivatives = self.derive()
-        dfdx = partial_derivatives[0]
-        dfdy = partial_derivatives[1]
 
         self.step_history.append(points)
         t = 0
+        feed_dict_grad = self.feed_dict
 
-        while (abs(np.linalg.norm(tol_test)) > tol) or t < n_iters:
+        while (abs(np.linalg.norm(tol_test)) > tol) and t < n_iters:
             
-            grad = np.array([
-                dfdx.evaluate({self.variables[0]: points[0], self.variables[1]: points[1]}),
-                dfdy.evaluate({self.variables[0]: points[0], self.variables[1]: points[1]})
-            ])
+            grad = np.array([partial.evaluate(feed_dict_grad) for partial in partial_derivatives])
             alpha_t = alpha / (1 + decay*t)
             momentum = beta*momentum - alpha_t*grad
             points = points + momentum
-
+            
             # updates
+
+            # need to update our feed_dict
+            for idx, (k, v) in enumerate(feed_dict_grad.items()):
+                feed_dict_grad[k] = points[idx]
+
             self.step_history.append(points)
             tol_test = self.step_history[-2] - self.step_history[-1]
             t += 1
 
-        print(f"Convergence achieved at {self.step_history[-1]}")
+        check_step_size = abs(np.linalg.norm(tol_test))
+        if t < n_iters and check_step_size < tol:
+            print(f"Convergence achieved at {self.step_history[-1]} on step {t}")
+        elif t == n_iters and check_step_size > tol:
+            print(f"GD failed to converge... Stuck at {self.step_history[-1]} at step {t}")
     
     def plot(self):
         pass
+
+if __name__ == "__main__":
+
+    x = Variable("x")
+    y = Variable("y")
+
+    a = 2.0
+    b = 100.0
+    
+    # Rosenbrock func => f(x, y) = (a - x)^2 + b(y - x^2)^2
+    rosenbrock_func = Add(Power(Add(Constant(a), Multiply(Constant(-1.0), x)) ,Constant(2.0)), Multiply(Constant(b), Power(Add(y, Multiply(Constant(-1.0), Power(x, Constant(2.0)))), Constant(2.0))))
+
+    feed_dict1 = {"x": -1.5, "y": 1.5}
+    # define gradient descent object
+    gd = GradientDescent(function=rosenbrock_func, feed_dict=feed_dict1)
+
+    # run gradient descent
+    gd.run(beta=0.0, n_iters=10000)
+
+    gd.run(beta=0.9, n_iters=10000)
 
 
         
