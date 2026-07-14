@@ -189,3 +189,42 @@ class Power(Expression):
         return f"({self.base} ** {self.exponent})"
     
 
+class GradientDescent():
+
+    def __init__(self, function, input):
+        self.function = function
+        self.input = input
+        self.step_history = [self.input[0]]
+
+    def derive(self):
+        return self.function.diff(self.input)
+    
+    def run(self, alpha=0.001, beta=0.9, decay=0.0, n_iters=1000, tol=1e-6):
+        """
+        Returns the trajectory (list of points) so we can plot convergence.
+        """
+
+        x0 = self.input[0]
+        momentum = np.zeros_like(x0)
+        tol_test = x0
+        diff_func_symbol = self.derive()
+        t = 0
+        while abs(np.linalg.norm(tol_test)) < tol:
+            grad = diff_func_symbol.evaluate(x0)
+            alpha_t = alpha / (1 + decay*t)
+            momentum = beta*momentum - alpha_t*grad
+            x = x0 + momentum
+
+            # updates
+            self.step_history.append(x)
+            tol_test = x0 - x
+            x0 = x
+            t += 1
+
+        print(f"Convergence achieved at {self.step_history[-1]}")
+    
+    def plot(self):
+        pass
+
+
+        
