@@ -222,7 +222,7 @@ class GradientDescent():
 
         self.step_history.append(points)
         t = 0
-        feed_dict_grad = self.feed_dict
+        feed_dict_grad = dict(self.feed_dict)
 
         while (abs(np.linalg.norm(tol_test)) > tol) and t < n_iters:
             
