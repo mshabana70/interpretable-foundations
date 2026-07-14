@@ -607,5 +607,9 @@ n\sigma^{2} &= \sum_{i=1}^{n} (x_{i} - \mu)^{2} \\
 \end{align*}
 $$
 
+**Question:** What's the difference between probability and likelihood?
+
+**Answer:** Likelihood is really for determining the parameters for a target distribution given the data you have. While probability is about the how likely a data sample is to occur based on a known distribution that the data fits.
+
 
 
