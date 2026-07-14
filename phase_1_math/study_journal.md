@@ -496,3 +496,116 @@ Fixing this with `column_stack()` led to the two correct values for bias and wei
 
 Optional thing to do here: Standardize X using *z-score normalization* to improve the speed of GD convergence. Essential restructure X to be a mean of 0 and have all values of the X be in terms of standard deviations from the mean. 
 
+## Week 6 - Probability & Statistics for ML
+
+### Monday 7/13
+
+This week we need to implement MLE for a gaussian. Given $N$ samples, we need to compute the ML estimates of mean and variance from scratch. 
+
+To verify, we compare with `np.mean` and `np.var`.
+
+Probability is the value of a given event occuring based on the distribution that event is pulled from. For example, the probability of picking a sample that is 50 grams from a population with a normal distribution of mean = 50 and std = 2.5 would be 50%. 
+
+Likelihood is a bit different as it measure the value of a given event as the point on the distribution that that event falls on. 
+
+**In summary:** 
+
+Probabilities are the areas under a fixed distribution ($Pr(\text{Data} | \text{Distribution})$). 
+
+Likelihoods are the y-axis values for fixed data points with distributions that can be moved ($L(\text{Distribution} | \text{Data})$)
+
+Probability is used for prediction, Likelihood is used for parameter estimation ($\theta$)
+
+**Maximum Likelihood Estimation:**
+
+The goal is to find the optimal way to fit a distribution to a given data sample. The reason you want to fit a distribution to your data is it can be easier to work with and it is also more general - it applies to every experiment of the same type.
+
+We want to fit a distribution where the likelihood of observing all the data under a distribution with some given mean and std to be high, or at it's maximum. 
+
+We essentially can try all of the possible values for the distribution mean and std where that likelihood is at it's maximum.
+
+> NOTE: it is important to remember that we are looking for the mean of the *distribution*, not of the data. But it so happens when trying to fit a Gaussian distribution, these are the same. 
+
+
+How do we compute the Maximum Likelihood Estimate (MLE)?
+
+We start with the *probability density function (PDF)* of the Gaussian (Normal) Distribution:
+
+$$pr(x | \mu, \sigma) = \frac{1}{\sqrt{2\pi\sigma^{2}}} e^{\frac{-(x - \mu)^{2}}{2\sigma^{2}}}$$
+
+where the parameters for the PDF is $\mu$ (mean of distribution) and $\sigma$ (standard deviation of the distribution).
+
+The likelihood can be computed with the same definition as above, except we are computing the parameters of the gaussian distribution $\mu$ and $\sigma$ given the data we observed $x$:
+
+$$L(\mu, \sigma | x) = \frac{1}{\sqrt{2\pi\sigma^{2}}} e^{\frac{-(x - \mu)^{2}}{2\sigma^{2}}}$$
+
+We can basically plug in values for $\mu$ and $\sigma$ (either one fixed) and compute the likelihood at each given point $x_{i}$ until we find the maximum likelihood.
+
+Another way would be to:
+
+If we solve for the maximum likelihood estimate for $\mu$, we treat $\sigma$ like a constant and then find where the slope of it's likelihood function is 0 (it's maximum "peak")
+
+
+If we solve for the maximum likelihood estimate for $\sigma$, we treat $\mu$ like a constant and then find where the slope of it's likelihood function is 0 (it's maximum "peak")
+
+Now if we want to solve for the maximum likelihood estimates given $n$ data samples $x_1, \ldots, x_n$, we take the product of all the likelihoods $L(\mu, \sigma | x_1) \times \ldots \times L(\mu, \sigma | x_n)$ which gives us the likelihood of the whole $n$ data samples and then the maximum of this result.
+
+We could also just take the derivative of the Likelihood function with respect to $\mu$ and with respect to $\sigma$. We can also first take the log of the likelihood to make it easier to compute these derivatives:
+
+$$
+\begin{align*}
+\log[L(\mu, \sigma | x_1, \ldots, x_n)] &= \log(\prod_{i=1}^{n} \frac{1}{\sqrt{2\pi\sigma^{2}}} e^{\frac{-(x_i - \mu)^{2}}{2\sigma^{2}}}) \\
+&= \sum_{i=1}^{n} \log\left(\frac{1}{\sqrt{2\pi\sigma^{2}}} e^{\frac{-(x_i - \mu)^{2}}{2\sigma^{2}}}\right) \\
+&= \sum_{i=1}^{n} \left( -\frac{1}{2}\log(2\pi) - \log(\sigma) - \frac{(x_{i} - \mu)^{2}}{2\sigma^{2}} \right) \\
+&= -\frac{n}{2}\log(2\pi) - n\log(\sigma) - \sum_{i=1}^{n} \frac{(x_{i} - \mu)^{2}}{2\sigma^{2}}
+\end{align*}
+$$
+
+Now we can take the derivative of this simplified log-likelihood function w.r.t $\mu$ and $\sigma$:
+
+**With respect to $\mu$**:
+
+$$
+\begin{align*}
+\frac{\partial}{\partial\mu}\log(L) &= \frac{\partial}{\partial\mu}\left( -\frac{n}{2}\log(2\pi) - n\log(\sigma) - \sum_{i=1}^{n} \frac{(x_{i} - \mu)^{2}}{2\sigma^{2}} \right) \\
+&= 0 - 0 + \sum_{i=1}^{n}\frac{(x_{i} - \mu)}{\sigma^{2}} \\
+&= \sum_{i=1}^{n}\frac{(x_{i} - \mu)}{\sigma^{2}} \\
+&= \frac{1}{\sigma^{2}}[(x_1 + \ldots + x_{n}) - n\mu]
+\end{align*}
+$$
+
+If we set the resulting derivative to 0, we can find the value of $\mu$ that maximizes the log likelihood:
+
+$$
+\begin{align*}
+0 &= \frac{1}{\sigma^{2}}[(x_1 + \ldots + x_{n}) - n\mu] \\
+0 &= \left( \sum_{i=1}^{n}x_{i} \right) - n\mu \\
+n\mu &= \sum_{i=1}^{n}x_{i} \\
+\mu &= \frac{1}{n} \sum_{i=1}^{n}x_{i}
+\end{align*}
+$$
+
+**With respect to $\sigma$**:
+
+$$
+\begin{align*}
+\frac{\partial}{\partial\sigma}\log(L) &= \frac{\partial}{\partial\sigma}\left( -\frac{n}{2}\log(2\pi) - n\log(\sigma) - \sum_{i=1}^{n} \frac{(x_{i} - \mu)^{2}}{2\sigma^{2}} \right) \\
+&= 0 - \frac{n}{\sigma} + \sum_{i=1}^{n} \frac{(x_{i} - \mu)^{2}}{\sigma^{3}} \\
+&= - \frac{n}{\sigma} + \frac{1}{\sigma^{3}}\sum_{i=1}^{n} (x_{i} - \mu)^{2}
+\end{align*}
+$$
+
+If we set the resulting derivative to 0, we can find the value of $\sigma$ that maximizes the log likelihood:
+
+$$
+\begin{align*}
+0 &= - \frac{n}{\sigma} + \frac{1}{\sigma^{3}}\sum_{i=1}^{n} (x_{i} - \mu)^{2} \\
+\frac{n}{\sigma} &= \frac{1}{\sigma^{3}} \sum_{i=1}^{n} (x_{i} - \mu)^{2} \\
+n\sigma^{2} &= \sum_{i=1}^{n} (x_{i} - \mu)^{2} \\
+\sigma^{2} &= \frac{1}{n} \sum_{i=1}^{n} (x_{i} - \mu)^{2} \\
+\sigma &= \sqrt{\frac{1}{n} \sum_{i=1}^{n} (x_{i} - \mu)^{2}}
+\end{align*}
+$$
+
+
+
