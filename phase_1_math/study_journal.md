@@ -508,6 +508,60 @@ $$x \leftarrow x - \alpha,\frac{\partial f}{\partial x}, \qquad y \leftarrow y -
 
 **Answer:** Extremely small LRs make convergence incredibly slow and inefficient. However, if the LR is too large then you could overshoot the global minimum search and oscillate forever, causing a failure in convergence.
 
+### Tuesday 7/14
+
+didn't do a damn thing today smh.
+
+### Wednesday 7/15
+
+Still didn't do a damn thing my goodness!!!
+
+### Thursday 7/16
+
+Going to start with catching up on day 2 tasks:
+
+With vanilla GD, we go wherever the steepest descent is, regardless of whether or not it leads to the global minimum.
+
+With momentum GD, we add a *velocity* to our descent, carrying us faster down the descent and also dampening whenever we hit a bump or a incline. 
+
+With Nesterov GD, we still have this *velocity* from momentum but it is a bit smarter than that. We now **look ahead** to see where the momentum is going to take us in the descent. If we see that momentum is going to take us up an incline or flip from *descent* to *ascent*, we stop the descent and correct ourselves.
+
+Let's put this in mathematical terms:
+
+**Vanilla GD:** We are trying to minimize an objective function $f(\theta)$, where $\theta$ represents our parameters. At any step $t$, the gradient of the loss surface with respect to our parameters is $\nabla f(\theta_{t})$. Let $\eta$ be our learning rate. When we calculate our update, it is completely localized. We take the gradient at our current position and take a step:
+
+$$\theta_{t+1} = \theta_{t} - \eta\nabla f(\theta_{t})$$
+
+The issue with this approach is when our loss surface has high curvature (an ill-conditioned loss), the gradient ends up pointing across these curves rather than down it, leading to oscillation. Additionally, there is no way to avoid ending up in shallow valleys or local minimums. 
+
+**Momentum GD:** To help address the oscillation problem, we add a velocity vector $v_{t}$ and a momentum coefficient $\beta$ (usually around 0.9). 
+
+$$
+\begin{align*}
+v_{t+1} &= \beta v_{t} + \eta\nabla f(\theta_{t}) \\
+\theta_{t+1} &= \theta_{t} - v_{t+1}
+\end{align*}
+$$
+
+The step we take here ($- v_{t+1}$) is a vector addtion of two things:
+1. Our accumulated history $\beta v_{t}$ (where our momentum is carrying you)
+2. Our current gradient $\eta\nabla f(\theta_t)$ (the slope we are currently positioned on)
+
+The new issue with this now is that momentum is blind and is just taking us wherever the gradient says to go, just at a greater speed now. There is no way to know if we head in the wrong direction or make a mistake (overshoot a minimum) until after the update since the gradient is only computed at the current position.
+
+**Nesterov GD:** This is where we improve our approach AGAIN and address our momentum blindness. If we know that our momentum term $\beta v_{t}$ is going to drap our parameters forward regardless of what the current gradient says, why calculate the gradient at our current position? 
+
+Instead, we should calculate the gradient at our *look-ahead position*: $\theta_{t} - \beta v_{t}$. This makes our update:
+
+$$
+\begin{align*}
+v_{t+1} &= \beta v_{t} + \eta\nabla f(\theta_t - \beta v_{t}) \\
+\theta_{t+1} &= \theta_t - v_{t+1}
+\end{align*}
+$$
+
+The difference now is that instead of evaluating the gradient at $\theta_t$, we take a phantom step using *only* the momentum $\theta_t - \beta v_{t}$ and evaluate the gradient there. Once we get this look-ahead evaluation, we correct our momentum term based on that look-ahead position.
+
 ## Week 6 - Probability & Statistics for ML
 
 ### Monday 7/13

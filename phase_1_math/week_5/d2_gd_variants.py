@@ -1,5 +1,8 @@
 import math
 import numpy as np
+
+import math
+import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 from matplotlib.collections import LineCollection
@@ -199,7 +202,9 @@ class GradientDescent():
         self.feed_dict = feed_dict
         self.inputs = list(feed_dict.values()) # should be a list of floats
         self.variables = list(feed_dict.keys()) # should be a list of strings
-        self.step_history = []
+        self.step_history_momentum = []
+        self.step_history_vanilla = []
+        self.step_history_nesterov = []
 
     def derive(self):
         self.partials = []
@@ -209,8 +214,47 @@ class GradientDescent():
             self.partials.append(self.function.diff(var))
         return self.partials
     
-    def run(self, alpha=0.001, beta=0.9, decay=0.0, n_iters=1000, tol=1e-6):
+    def run_vanilla(self, alpha=0.001, n_iters=1000, tol=1e-6):
         """
+        Vanilla GD with no bells and wistles.
+
+        Returns the trajectory (list of points) so we can plot convergence.
+        """
+
+        points = np.array(self.inputs)
+        tol_test = points
+        partial_derivatives = self.derive()
+
+        self.step_history_vanilla.append(points)
+        t = 0
+        feed_dict_grad = dict(self.feed_dict)
+
+        while (abs(np.linalg.norm(tol_test)) > tol) and t < n_iters:
+            
+            grad = np.array([partial.evaluate(feed_dict_grad) for partial in partial_derivatives])
+            update = alpha*grad
+            points = points - update
+            
+            # updates
+
+            # need to update our feed_dict
+            for idx, (k, v) in enumerate(feed_dict_grad.items()):
+                feed_dict_grad[k] = points[idx]
+
+            self.step_history_vanilla.append(points)
+            tol_test = self.step_history_vanilla[-2] - self.step_history_vanilla[-1]
+            t += 1
+
+        check_step_size = abs(np.linalg.norm(tol_test))
+        if t < n_iters and check_step_size < tol:
+            print(f"Vanilla Convergence achieved at {self.step_history_vanilla[-1]} on step {t}")
+        elif t == n_iters and check_step_size > tol:
+            print(f"Vanilla GD failed to converge... Stuck at {self.step_history_vanilla[-1]} at step {t}")
+    
+    def run_momentum(self, alpha=0.001, beta=0.9, decay=0.0, n_iters=1000, tol=1e-6):
+        """
+        GD with momentum and LR decay.
+
         Returns the trajectory (list of points) so we can plot convergence.
         """
 
@@ -220,7 +264,7 @@ class GradientDescent():
         tol_test = points
         partial_derivatives = self.derive()
 
-        self.step_history.append(points)
+        self.step_history_momentum.append(points)
         t = 0
         feed_dict_grad = dict(self.feed_dict)
 
@@ -237,15 +281,19 @@ class GradientDescent():
             for idx, (k, v) in enumerate(feed_dict_grad.items()):
                 feed_dict_grad[k] = points[idx]
 
-            self.step_history.append(points)
-            tol_test = self.step_history[-2] - self.step_history[-1]
+            self.step_history_momentum.append(points)
+            tol_test = self.step_history_momentum[-2] - self.step_history_momentum[-1]
             t += 1
 
         check_step_size = abs(np.linalg.norm(tol_test))
         if t < n_iters and check_step_size < tol:
-            print(f"Convergence achieved at {self.step_history[-1]} on step {t}")
+            print(f"Momentum GD Convergence achieved at {self.step_history_momentum[-1]} on step {t}")
         elif t == n_iters and check_step_size > tol:
-            print(f"GD failed to converge... Stuck at {self.step_history[-1]} at step {t}")
+            print(f"Momentum GD failed to converge... Stuck at {self.step_history_momentum[-1]} at step {t}")
+    
+    def run_nesterov(self):
+        pass
+    
     
     def plot(self, ax=None, path_color="#ff9500", label=None, draw_field=True):
         traj = np.array(self.step_history)
@@ -308,11 +356,11 @@ if __name__ == "__main__":
     # Figure 1 — trajectory (shared spatial axes)
     ax_traj = plain.plot(path_color="#ff4d4d", label="Beta = 0.0")
     mom.plot(ax=ax_traj, path_color="#ff9500", label="Beta = 0.9", draw_field=False)
-    ax_traj.figure.savefig("./figs/D1_rosenbrock_GD_trajectory.png", dpi=130)
+    ax_traj.figure.savefig("rosenbrock_GD_trajectory.png", dpi=130)
 
     # Figure 2 — convergence (its OWN iteration–loss axes; do NOT pass ax_traj)
     ax_conv = plain.plot_convergence(color="#ff4d4d", label="Beta = 0.0")
     mom.plot_convergence(ax=ax_conv, color="#ff9500", label="Beta = 0.9")
-    ax_conv.figure.savefig("./figs/D1_rosenbrock_GD_convergence.png", dpi=130)
+    ax_conv.figure.savefig("rosenbrock_GD_convergence.png", dpi=130)
 
         
