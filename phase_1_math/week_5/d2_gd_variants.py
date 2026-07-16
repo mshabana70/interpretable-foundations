@@ -251,13 +251,12 @@ class GradientDescent():
                 feed_dict_grad[k] = points[idx]
 
             self.step_history_vanilla.append(points)
-            tol_test = self.step_history_vanilla[-2] - self.step_history_vanilla[-1]
             t += 1
 
-        check_step_size = abs(np.linalg.norm(tol_test))
-        if t < n_iters and check_step_size < tol:
+        check_grad = abs(np.linalg.norm(grad))
+        if t < n_iters and check_grad < tol:
             print(f"Vanilla Convergence achieved at {self.step_history_vanilla[-1]} on step {t}")
-        elif t == n_iters and check_step_size > tol:
+        elif t == n_iters and check_grad > tol:
             print(f"Vanilla GD failed to converge... Stuck at {self.step_history_vanilla[-1]} at step {t}")
     
     def run_momentum(self, alpha=0.001, beta=0.9, decay=0.0, n_iters=1000, tol=1e-6):
@@ -291,13 +290,12 @@ class GradientDescent():
                 feed_dict_grad[k] = points[idx]
 
             self.step_history_momentum.append(points)
-            tol_test = self.step_history_momentum[-2] - self.step_history_momentum[-1]
             t += 1
 
-        check_step_size = abs(np.linalg.norm(tol_test))
-        if t < n_iters and check_step_size < tol:
+        check_grad = abs(np.linalg.norm(grad))
+        if t < n_iters and check_grad < tol:
             print(f"Momentum GD Convergence achieved at {self.step_history_momentum[-1]} on step {t}")
-        elif t == n_iters and check_step_size > tol:
+        elif t == n_iters and check_grad > tol:
             print(f"Momentum GD failed to converge... Stuck at {self.step_history_momentum[-1]} at step {t}")
     
     def run_nesterov(self, alpha=0.001, beta=0.9, decay=0.0, n_iters=1000, tol=1e-6):
@@ -342,16 +340,15 @@ class GradientDescent():
             grad_check = np.array([partial.evaluate(feed_dict_grad) for partial in partial_derivatives])
             self.step_history_nesterov.append(points)
             curr_momentum = corrected_momentum
-            tol_test = self.step_history_nesterov[-2] - self.step_history_nesterov[-1]
             t += 1
         
-        check_step_size = abs(np.linalg.norm(tol_test))
-        if t < n_iters and check_step_size < tol:
+        check_grad = abs(np.linalg.norm(grad_check))
+        if t < n_iters and check_grad < tol:
             print(f"Nesterov GD Convergence achieved at {self.step_history_nesterov[-1]} on step {t}")
-        elif t == n_iters and check_step_size > tol:
+        elif t == n_iters and check_grad > tol:
             print(f"Nesterov GD failed to converge... Stuck at {self.step_history_nesterov[-1]} at step {t}")
     
-    def plot(self, history, ax=None, path_color="#ff9500", label=None, draw_field=True, minimum=None):
+    def plot(self, history, ax=None, path_color="#ff9500", label=None, draw_field=True, minimum=None, bounds=None):
         traj = np.array(history)
         xs, ys = traj[:, 0], traj[:, 1]
 
@@ -360,8 +357,12 @@ class GradientDescent():
         
         if draw_field:
             pad = 0.5
-            gx = np.linspace(xs.min() - pad, xs.max() + pad, 400)
-            gy = np.linspace(ys.min() - pad, ys.max() + pad, 400)
+            if bounds is not None:
+                xmin, xmax, ymin, ymax = bounds
+            else:
+                xmin, xmax, ymin, ymax = xs.min(), xs.max(), ys.min(), ys.max()
+            gx = np.linspace(xmin - pad, xmax + pad, 400)
+            gy = np.linspace(ymin - pad, ymax + pad, 400)
             GX, GY = np.meshgrid(gx, gy)
             Z = np.array([[self.eval_function([xv, yv]) for xv in gx] for yv in gy])
             levels = np.logspace(-1, np.log10(Z.max()), 25)
@@ -422,12 +423,16 @@ if __name__ == "__main__":
     gd_bowl.run_nesterov(beta=0.9, n_iters=20000)
 
     # Figure 1 — trajectory (shared spatial axes)
-    ax_traj = gd.plot(gd.step_history_vanilla, minimum=(2, 4), label="Vanilla GD", draw_field=True)
+    hist_r = np.vstack([gd.step_history_vanilla, gd.step_history_momentum, gd.step_history_nesterov])
+    bounds_r = (hist_r[:, 0].min(), hist_r[:, 0].max(), hist_r[:, 1].min(), hist_r[:, 1].max())
+    ax_traj = gd.plot(gd.step_history_vanilla, minimum=(2, 4), label="Vanilla GD", draw_field=True, bounds=bounds_r)
     gd.plot(gd.step_history_momentum, ax=ax_traj, path_color="#3700ff", label="Momentum GD; Beta 0.9", draw_field=False)
     gd.plot(gd.step_history_nesterov, ax=ax_traj, path_color="#04ea00", label="Nesterov GD; Beta 0.9", draw_field=False)
     ax_traj.figure.savefig("./figs/D2_rosenbrock_GD_trajectory.png", dpi=130)
 
-    axb_traj = gd_bowl.plot(gd_bowl.step_history_vanilla, minimum=(0, 0), label="Vanilla GD", draw_field=True)
+    hist_b = np.vstack([gd_bowl.step_history_vanilla, gd_bowl.step_history_momentum, gd_bowl.step_history_nesterov])
+    bounds_b = (hist_b[:, 0].min(), hist_b[:, 0].max(), hist_b[:, 1].min(), hist_b[:, 1].max())
+    axb_traj = gd_bowl.plot(gd_bowl.step_history_vanilla, minimum=(0, 0), label="Vanilla GD", draw_field=True, bounds=bounds_b)
     gd_bowl.plot(gd_bowl.step_history_momentum, ax=axb_traj, path_color="#3700ff", label="Momentum GD; Beta 0.9", draw_field=False)
     gd_bowl.plot(gd_bowl.step_history_nesterov, ax=axb_traj, path_color="#04ea00", label="Nesterov GD; Beta 0.9", draw_field=False)
     axb_traj.figure.savefig("./figs/D2_quadratic_GD_trajectory.png", dpi=130)
