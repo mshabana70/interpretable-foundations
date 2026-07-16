@@ -222,14 +222,14 @@ class GradientDescent():
         """
 
         points = np.array(self.inputs)
-        tol_test = points
         partial_derivatives = self.derive()
 
         self.step_history_vanilla.append(points)
         t = 0
         feed_dict_grad = dict(self.feed_dict)
+        grad = np.array([partial.evaluate(feed_dict_grad) for partial in partial_derivatives])
 
-        while (abs(np.linalg.norm(tol_test)) > tol) and t < n_iters:
+        while (abs(np.linalg.norm(grad)) > tol) and t < n_iters:
             
             grad = np.array([partial.evaluate(feed_dict_grad) for partial in partial_derivatives])
             update = alpha*grad
@@ -261,14 +261,14 @@ class GradientDescent():
         points = np.array(self.inputs)
 
         momentum = np.zeros_like(points)
-        tol_test = points
         partial_derivatives = self.derive()
 
         self.step_history_momentum.append(points)
         t = 0
         feed_dict_grad = dict(self.feed_dict)
+        grad = np.array([partial.evaluate(feed_dict_grad) for partial in partial_derivatives])
 
-        while (abs(np.linalg.norm(tol_test)) > tol) and t < n_iters:
+        while (abs(np.linalg.norm(grad)) > tol) and t < n_iters:
             
             grad = np.array([partial.evaluate(feed_dict_grad) for partial in partial_derivatives])
             alpha_t = alpha / (1 + decay*t)
@@ -291,9 +291,56 @@ class GradientDescent():
         elif t == n_iters and check_step_size > tol:
             print(f"Momentum GD failed to converge... Stuck at {self.step_history_momentum[-1]} at step {t}")
     
-    def run_nesterov(self):
-        pass
-    
+    def run_nesterov(self, alpha=0.001, beta=0.9, decay=0.0, n_iters=1000, tol=1e-6):
+        """
+        GD with nesterov look-ahead using momentum.
+
+        Returns the trajectory (list of points) so we can plot convergence.
+        """
+        points = np.array(self.inputs)
+        curr_momentum = np.zeros_like(points)
+        partial_derivatives = self.derive()
+
+        self.step_history_nesterov.append(points)
+        t = 0
+        feed_dict_grad = dict(self.feed_dict)
+        grad_check = np.array([partial.evaluate(feed_dict_grad) for partial in partial_derivatives])
+
+        while (abs(np.linalg.norm(grad_check)) > tol) and t < n_iters:
+
+            # we need to calculate the momentum first, then subtract it from our current position points.
+            look_ahead_points = points + (beta*curr_momentum)
+
+            # need to update our feed_dict
+            for idx, (k, v) in enumerate(feed_dict_grad.items()):
+                feed_dict_grad[k] = look_ahead_points[idx]
+
+            # now take the grad at this look_ahead
+            look_ahead_grad = np.array([partial.evaluate(feed_dict_grad) for partial in partial_derivatives])
+
+            # compute our momentum based on our look ahead correction
+            alpha_t = alpha / (1 + decay*t)
+            corrected_momentum = beta*curr_momentum - alpha_t*look_ahead_grad
+
+            # we update our original position based on this corrected momentum
+            points = points + corrected_momentum
+
+            # we have to update our feed_dict again but with our actual update position, not the look_ahead position
+            for idx, (k, v) in enumerate(feed_dict_grad.items()):
+                feed_dict_grad[k] = points[idx]
+            
+            # now we save our progression
+            grad_check = np.array([partial.evaluate(feed_dict_grad) for partial in partial_derivatives])
+            self.step_history_nesterov.append(points)
+            curr_momentum = corrected_momentum
+            tol_test = self.step_history_nesterov[-2] - self.step_history_nesterov[-1]
+            t += 1
+        
+        check_step_size = abs(np.linalg.norm(tol_test))
+        if t < n_iters and check_step_size < tol:
+            print(f"Nesterov GD Convergence achieved at {self.step_history_nesterov[-1]} on step {t}")
+        elif t == n_iters and check_step_size > tol:
+            print(f"Nesterov GD failed to converge... Stuck at {self.step_history_nesterov[-1]} at step {t}")
     
     def plot(self, ax=None, path_color="#ff9500", label=None, draw_field=True):
         traj = np.array(self.step_history)
@@ -344,23 +391,36 @@ if __name__ == "__main__":
     # Rosenbrock func => f(x, y) = (a - x)^2 + b(y - x^2)^2
     rosenbrock_func = Add(Power(Add(Constant(a), Multiply(Constant(-1.0), x)) ,Constant(2.0)), Multiply(Constant(b), Power(Add(y, Multiply(Constant(-1.0), Power(x, Constant(2.0)))), Constant(2.0))))
 
+    # Test on quadratic bowl function: x^2 + y^2
+    quad_bowl_func = Add(Power(x, Constant(2.0)), Power(y, Constant(2.0)))
+
     
     # define gradient descent objects
     feed_dict1 = {"x": -1.5, "y": 1.5}
-    plain = GradientDescent(rosenbrock_func, {"x": -1.5, "y": 1.5})
-    plain.run(beta=0.0, n_iters=20000)
+    gd = GradientDescent(rosenbrock_func, feed_dict1)
+    gd.run_vanilla(n_iters=20000)
 
-    mom = GradientDescent(rosenbrock_func, {"x": -1.5, "y": 1.5})
-    mom.run(beta=0.9, n_iters=20000)
+    gd.run_momentum(beta=0.9, n_iters=20000)
 
-    # Figure 1 — trajectory (shared spatial axes)
-    ax_traj = plain.plot(path_color="#ff4d4d", label="Beta = 0.0")
-    mom.plot(ax=ax_traj, path_color="#ff9500", label="Beta = 0.9", draw_field=False)
-    ax_traj.figure.savefig("rosenbrock_GD_trajectory.png", dpi=130)
+    gd.run_nesterov(beta=0.9, n_iters=20000)
 
-    # Figure 2 — convergence (its OWN iteration–loss axes; do NOT pass ax_traj)
-    ax_conv = plain.plot_convergence(color="#ff4d4d", label="Beta = 0.0")
-    mom.plot_convergence(ax=ax_conv, color="#ff9500", label="Beta = 0.9")
-    ax_conv.figure.savefig("rosenbrock_GD_convergence.png", dpi=130)
+    # define gradient descent objects
+    feed_dict2 = {"x": 9.0, "y": 10.5}
+    gd_bowl = GradientDescent(quad_bowl_func, feed_dict2)
+    gd_bowl.run_vanilla(n_iters=20000)
+
+    gd_bowl.run_momentum(beta=0.9, n_iters=20000)
+
+    gd_bowl.run_nesterov(beta=0.9, n_iters=20000)
+
+    # # Figure 1 — trajectory (shared spatial axes)
+    # ax_traj = plain.plot(path_color="#ff4d4d", label="Beta = 0.0")
+    # mom.plot(ax=ax_traj, path_color="#ff9500", label="Beta = 0.9", draw_field=False)
+    # ax_traj.figure.savefig("./figs/D2_rosenbrock_GD_trajectory.png", dpi=130)
+
+    # # Figure 2 — convergence (its OWN iteration–loss axes; do NOT pass ax_traj)
+    # ax_conv = plain.plot_convergence(color="#ff4d4d", label="Beta = 0.0")
+    # mom.plot_convergence(ax=ax_conv, color="#ff9500", label="Beta = 0.9")
+    # ax_conv.figure.savefig("./figs/D2_rosenbrock_GD_convergence.png", dpi=130)
 
         
