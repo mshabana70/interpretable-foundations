@@ -192,7 +192,7 @@ class Power(Expression):
         
     
     def __str__(self):
-        return f"({self.base} ** {self.exponent})"
+        return f"({self.base} ^ {self.exponent})"
     
 
 class GradientDescent():
@@ -213,6 +213,15 @@ class GradientDescent():
             # and storing the partials in a list to eval against in our grad loop
             self.partials.append(self.function.diff(var))
         return self.partials
+    
+    def eval_function(self, point):
+        """
+        Evaluate self.function at one point. `point` is aligned to self.variables order.
+
+        This is helpful for our plotting.
+        """
+        feed = {var: point[i] for i, var in enumerate(self.variables)}
+        return self.function.evaluate(feed)
     
     def run_vanilla(self, alpha=0.001, n_iters=1000, tol=1e-6):
         """
@@ -342,8 +351,8 @@ class GradientDescent():
         elif t == n_iters and check_step_size > tol:
             print(f"Nesterov GD failed to converge... Stuck at {self.step_history_nesterov[-1]} at step {t}")
     
-    def plot(self, ax=None, path_color="#ff9500", label=None, draw_field=True):
-        traj = np.array(self.step_history)
+    def plot(self, history, ax=None, path_color="#ff9500", label=None, draw_field=True, minimum=None):
+        traj = np.array(history)
         xs, ys = traj[:, 0], traj[:, 1]
 
         if ax is None:
@@ -354,25 +363,22 @@ class GradientDescent():
             gx = np.linspace(xs.min() - pad, xs.max() + pad, 400)
             gy = np.linspace(ys.min() - pad, ys.max() + pad, 400)
             GX, GY = np.meshgrid(gx, gy)
-            a, b = 2.0, 100.0
-            Z = ((a - GX) ** 2) + (b * (GY - GX ** 2)**2)
-            levels = np.logspace(-1, 3.5, 25)
+            Z = np.array([[self.eval_function([xv, yv]) for xv in gx] for yv in gy])
+            levels = np.logspace(-1, np.log10(Z.max()), 25)
             ax.contourf(GX, GY, Z, levels=levels, norm=LogNorm(), cmap="viridis", alpha=0.9)
-            ax.plot(2.0, 4.0, "*", color="gold", mec="black", ms=18, label="minimum (2, 4)")
+            if minimum is not None:
+                ax.plot(minimum[0], minimum[1], "*", color="gold", mec="black", ms=18, label="minimum")
         
-        pts  = traj.reshape(-1, 1, 2)
-        segs = np.concatenate([pts[:-1], pts[1:]], axis=1)
-        lc = LineCollection(segs, cmap="autumn", array=np.arange(len(segs)), lw=1.6)
-        ax.add_collection(lc)
-        ax.plot(xs[0], ys[0], "o", color="white", mec="black", ms=8)   # start
+        ax.plot(xs, ys, color=path_color, label=label)   # start
+        ax.plot(xs[0], ys[0], "o", color="white", mec="black", ms=7)
         ax.set_xlabel("x"); ax.set_ylabel("y")
-        ax.set_title("Gradient descent trajectory on Rosenbrock")
+        ax.set_title(f"GD trajectory on f = {self.function}")
         ax.legend(loc="upper left", framealpha=0.9)
         return ax
     
-    def plot_convergence(self, ax=None, color="#ff9500", label=None):
-        traj = np.array(self.step_history)
-        fx = (2.0 - traj[:,0])**2 + 100.0*(traj[:,1] - traj[:,0]**2)**2
+    def plot_convergence(self, history, ax=None, color="#ff9500", label=None):
+        traj = np.array(history)
+        fx = np.array([self.eval_function(p) for p in traj])
         if ax is None: _, ax = plt.subplots()
         ax.semilogy(fx, color=color, label=label)          # <-- semilogy, not plot
         ax.set_xlabel("iteration"); ax.set_ylabel("f(x, y)  (log)")
@@ -397,6 +403,7 @@ if __name__ == "__main__":
     
     # define gradient descent objects
     feed_dict1 = {"x": -1.5, "y": 1.5}
+    print(f"Running Gradient Descent Variants on {rosenbrock_func}")
     gd = GradientDescent(rosenbrock_func, feed_dict1)
     gd.run_vanilla(n_iters=20000)
 
@@ -406,6 +413,7 @@ if __name__ == "__main__":
 
     # define gradient descent objects
     feed_dict2 = {"x": 9.0, "y": 10.5}
+    print(f"\nRunning Gradient Descent Variants on {quad_bowl_func}")
     gd_bowl = GradientDescent(quad_bowl_func, feed_dict2)
     gd_bowl.run_vanilla(n_iters=20000)
 
@@ -413,14 +421,26 @@ if __name__ == "__main__":
 
     gd_bowl.run_nesterov(beta=0.9, n_iters=20000)
 
-    # # Figure 1 — trajectory (shared spatial axes)
-    # ax_traj = plain.plot(path_color="#ff4d4d", label="Beta = 0.0")
-    # mom.plot(ax=ax_traj, path_color="#ff9500", label="Beta = 0.9", draw_field=False)
-    # ax_traj.figure.savefig("./figs/D2_rosenbrock_GD_trajectory.png", dpi=130)
+    # Figure 1 — trajectory (shared spatial axes)
+    ax_traj = gd.plot(gd.step_history_vanilla, minimum=(2, 4), label="Vanilla GD", draw_field=True)
+    gd.plot(gd.step_history_momentum, ax=ax_traj, path_color="#3700ff", label="Momentum GD; Beta 0.9", draw_field=False)
+    gd.plot(gd.step_history_nesterov, ax=ax_traj, path_color="#04ea00", label="Nesterov GD; Beta 0.9", draw_field=False)
+    ax_traj.figure.savefig("./figs/D2_rosenbrock_GD_trajectory.png", dpi=130)
 
-    # # Figure 2 — convergence (its OWN iteration–loss axes; do NOT pass ax_traj)
-    # ax_conv = plain.plot_convergence(color="#ff4d4d", label="Beta = 0.0")
-    # mom.plot_convergence(ax=ax_conv, color="#ff9500", label="Beta = 0.9")
-    # ax_conv.figure.savefig("./figs/D2_rosenbrock_GD_convergence.png", dpi=130)
+    axb_traj = gd_bowl.plot(gd_bowl.step_history_vanilla, minimum=(0, 0), label="Vanilla GD", draw_field=True)
+    gd_bowl.plot(gd_bowl.step_history_momentum, ax=axb_traj, path_color="#3700ff", label="Momentum GD; Beta 0.9", draw_field=False)
+    gd_bowl.plot(gd_bowl.step_history_nesterov, ax=axb_traj, path_color="#04ea00", label="Nesterov GD; Beta 0.9", draw_field=False)
+    axb_traj.figure.savefig("./figs/D2_quadratic_GD_trajectory.png", dpi=130)
+
+    # Figure 2 — convergence (its OWN iteration–loss axes; do NOT pass ax_traj)
+    ax_conv = gd.plot_convergence(gd.step_history_vanilla, label="Vanilla")
+    gd.plot_convergence(gd.step_history_momentum, ax=ax_conv,  color="#ff4d4d", label="Momentum GD; Beta 0.9")
+    gd.plot_convergence(gd.step_history_nesterov, ax=ax_conv,  color="#1ddc13", label="Nesterov GD; Beta 0.9")
+    ax_conv.figure.savefig("./figs/D2_rosenbrock_GD_convergence.png", dpi=130)
+    
+    axb_conv = gd_bowl.plot_convergence(gd_bowl.step_history_vanilla, label="Vanilla")
+    gd_bowl.plot_convergence(gd_bowl.step_history_momentum, ax=axb_conv,  color="#ff4d4d", label="Momentum GD; Beta 0.9")
+    gd_bowl.plot_convergence(gd_bowl.step_history_nesterov, ax=axb_conv,  color="#1ddc13", label="Nesterov GD; Beta 0.9")
+    axb_conv.figure.savefig("./figs/D2_quadratic_GD_convergence.png", dpi=130)
 
         

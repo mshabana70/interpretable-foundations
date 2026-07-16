@@ -562,6 +562,14 @@ $$
 
 The difference now is that instead of evaluating the gradient at $\theta_t$, we take a phantom step using *only* the momentum $\theta_t - \beta v_{t}$ and evaluate the gradient there. Once we get this look-ahead evaluation, we correct our momentum term based on that look-ahead position.
 
+**Question:** Why does momentum help?
+
+**Answer:** Momentum helps our descent from oscillating in a region of high curvature in the loss space. Instead of vanilla gradient descent, which will get stuck over-correcting when it jumps from one side of the valley to the next, momentum will allow us to slow down or dampen our descent until our current position gradient reaches a zero value. Additionally, it helps us speed past shallow valleys or local minimums, which can be more helpful in finding teh global minimum.
+
+---
+
+Moving on to Stochastic gradient descent.
+
 ## Week 6 - Probability & Statistics for ML
 
 ### Monday 7/13
