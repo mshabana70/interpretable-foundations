@@ -176,6 +176,62 @@ def train(optimizer_fn, X, y, **kwargs):
     return optimizer_fn(X, y, **kwargs)
 
 
+def plot_showdown(preds_raw, preds_norm, normal_raw, normal_norm, y,
+                  floor_raw, floor_norm, save_path="./figs/D5_optimizer_showdown.png"):
+    """
+    2x2 grid:
+      left column  = predicted-vs-actual (each optimizer + normal-eq target)
+      right column = loss vs iteration (semilogy) with the normal-eq loss floor
+      top row = raw features,  bottom row = standardized features
+    preds_* are dicts {name: [predictions, loss_history]}.
+    """
+    import os
+    os.makedirs(os.path.dirname(save_path), exist_ok=True)
+
+    colors = {"vanilla": "#ff7f0e", "momentum": "#1f77b4", "nesterov": "#2ca02c",
+              "SGD": "#d62728", "Adam": "#9467bd"}
+    y = np.asarray(y, dtype=float)
+    # scatter is unreadable with 10k x 5 points -> plot a fixed random 300-point sample
+    sub = np.random.default_rng(0).choice(len(y), size=min(300, len(y)), replace=False)
+
+    # shared log y-limits so the two loss panels are directly comparable
+    all_losses = [v for d in (preds_raw, preds_norm) for (_, lh) in d.values() for v in lh]
+    lo = min(min(all_losses), floor_raw, floor_norm) * 0.7
+    hi = max(all_losses) * 1.3
+
+    fig, axes = plt.subplots(2, 2, figsize=(15, 12))
+
+    def fit_panel(ax, preds_dict, normal_preds, title):
+        lims = [float(y.min()), float(y.max())]
+        ax.plot(lims, lims, "k--", lw=1, alpha=0.5, label="perfect (y = x)")
+        ax.scatter(y[sub], np.asarray(normal_preds)[sub], s=24, c="black", marker="x",
+                   linewidths=1.2, label="Normal Eq (target)", zorder=6)
+        for name, (preds, _) in preds_dict.items():
+            ax.scatter(y[sub], np.asarray(preds)[sub], s=12, alpha=0.5,
+                       color=colors[name], label=name)
+        ax.set_xlabel("actual Performance Index"); ax.set_ylabel("predicted")
+        ax.set_title(title); ax.legend(fontsize=8, loc="upper left")
+
+    def loss_panel(ax, preds_dict, floor, title):
+        for name, (_, lh) in preds_dict.items():
+            ax.semilogy(lh, color=colors[name], lw=1.6, label=name)
+        ax.axhline(floor, ls="--", c="black", lw=1.2, label=f"Normal Eq loss ≈ {floor:.2f}")
+        ax.set_ylim(lo, hi)
+        ax.set_xlabel("iteration"); ax.set_ylabel("MSE (log)")
+        ax.set_title(title); ax.legend(fontsize=8); ax.grid(alpha=0.3, which="both")
+
+    fit_panel(axes[0, 0], preds_raw,  normal_raw,  "Model fit — RAW features")
+    loss_panel(axes[0, 1], preds_raw,  floor_raw,  "Convergence — RAW features")
+    fit_panel(axes[1, 0], preds_norm, normal_norm, "Model fit — STANDARDIZED features")
+    loss_panel(axes[1, 1], preds_norm, floor_norm, "Convergence — STANDARDIZED features")
+
+    fig.suptitle("Optimizer Showdown — Student Performance regression", fontsize=15)
+    fig.tight_layout(rect=(0, 0, 1, 0.98))
+    fig.savefig(save_path, dpi=130)
+    print(f"[SAVED] {save_path}")
+    return fig
+
+
 if __name__ == "__main__":
     
     print(f"Loading Student Performance Dataset...")
@@ -190,7 +246,9 @@ if __name__ == "__main__":
     X_aug = np.hstack((np.ones((X.shape[0], 1)), X)) # shape => N x (d + 1)
 
     print(f"[STARTING] Unnormalized run")
-    normal_pred = normal_eq(X_aug, y_np)
+    normal_theta_raw = normal_eq(X_aug, y_np)
+    normal_preds_raw = predict(X_aug, normal_theta_raw)      # target model's predictions
+    floor_raw = loss(X_aug, y_np, normal_theta_raw)          # best achievable MSE (~4.15)
     vanilla_GD_preds, vanilla_GD_loss = train(vanilla_GD, X=X_aug, y=y_np, alpha=0.0001)
     momentum_GD_preds, momentum_GD_loss = train(momentum_GD, X=X_aug, y=y_np, alpha=0.0001, beta=0.9)
     nesterov_GD_preds, nesterov_GD_loss = train(nesterov_GD, X=X_aug, y=y_np, alpha=0.0001, beta=0.9)
@@ -214,7 +272,9 @@ if __name__ == "__main__":
     normalized_X = (X - dataset_mean) / dataset_std
     normalized_X_aug = np.hstack((np.ones((normalized_X.shape[0], 1)), normalized_X))
 
-    normal_pred = normal_eq(normalized_X_aug, y_np)
+    normal_theta_norm = normal_eq(normalized_X_aug, y_np)
+    normal_preds_norm = predict(normalized_X_aug, normal_theta_norm)
+    floor_norm = loss(normalized_X_aug, y_np, normal_theta_norm)
     vanilla_GD_preds, vanilla_GD_loss = train(vanilla_GD, X=normalized_X_aug, y=y_np)
     momentum_GD_preds, momentum_GD_loss = train(momentum_GD, X=normalized_X_aug, y=y_np, beta=0.9)
     nesterov_GD_preds, nesterov_GD_loss = train(nesterov_GD, X=normalized_X_aug, y=y_np, beta=0.9)
@@ -230,7 +290,11 @@ if __name__ == "__main__":
     }
     print(f"[COMPLETE] Normalized run")
 
-    # TODO: plot graphs now
+    plot_showdown(
+        y_preds_unnormalized, y_preds_normalized,
+        normal_preds_raw, normal_preds_norm,
+        y_np, floor_raw, floor_norm,
+    )
 
 
 
