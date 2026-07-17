@@ -658,6 +658,28 @@ v_{t} &= \beta_{v}v_{t-1} + (1 - \beta_{v})\nabla f (\theta_t)^{2} \\
 \end{align*}
 $$
 
+**Question:** What problem does Adam solve that vanilla SGD doesn't?
+
+**Answer:** In this scenario, nothing really. Adam introduces additional overhead when the problem is already well-behaved and isn't too noisy. Adam beats out SGD when the problem is high-dimensionality and ill-conditioned. There, Adam helps reduce the noise and scale its descent across high-variance parameter magnitudes.
+
+---
+
+Ok for the friday challenge we are going to implement an **optimizer showdown**. 
+
+Need to implement a `train(optimizer_fn, X, y, ...)` function that will loop over 5 optimizers:
+
+1. Vanilla GD
+2. Momentum GD
+3. Nesterov GD
+4. Mini-batch SGD
+5. Adam
+
+The dataset will be a multi-feature linear regression with purposefully bad feature scaling (e.g., $x_1 \in [0, 1], x_2 \in [0, 10000]$) so $\kappa(X^{\top}X) $ is large.
+
+The ground truth is the *normal equation* $\theta = (X^{\top}X)^{-1}X^{\top}y$ this will be our target plot
+
+Then we need to run our test on unstandardized data, plot it, then rerun it on standardized data and compare plots. Should see the more optimizers fit the target data once the features are standardized. Adam should do well in both scenarios.
+
 
 ## Week 6 - Probability & Statistics for ML
 
