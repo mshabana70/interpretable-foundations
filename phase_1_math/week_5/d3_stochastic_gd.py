@@ -29,7 +29,7 @@ def SGD(starting_params, dataset, lr=0.001, batch=64, n_iters=1000, tol=0.2):
     loss_history = []
     t = 0
     
-    while (curr_avg_loss > tol) and t < n_iters:
+    while t < n_iters:
 
         batch_sample = rng.choice(dataset, size=batch, replace=False)
         
@@ -53,7 +53,8 @@ def SGD(starting_params, dataset, lr=0.001, batch=64, n_iters=1000, tol=0.2):
         theta_t = theta_t_1
         
         # our condition check is going to be on the current average loss over our batch:
-        curr_avg_loss = eval_loss(theta_t_1, dataset)
+        #curr_avg_loss = eval_loss(theta_t_1, dataset) # if we want smooth convergence curves
+        curr_avg_loss = (1 / float(batch)) * sum([((theta_t[0] * batch_point[0] + theta_t[1]) - batch_point[1]) ** 2 for batch_point in batch_sample])
         loss_history.append(curr_avg_loss)
         t += 1
     
@@ -92,7 +93,7 @@ def test():
     plot(step_history_64, loss_history_64, dataset, ax=ax_loss_plot, color="#ff00ae", label=f"SGD Batch 64; Done in {num_of_iters_64}")
     plot(step_history_128, loss_history_128, dataset, ax=ax_loss_plot, color="#3700ff", label=f"SGD Batch 128; Done in {num_of_iters_128}")
     plot(step_history_1000, loss_history_1000, dataset, ax=ax_loss_plot, color="#090610", label=f"SGD Batch 1000; Done in {num_of_iters_1000}")
-    ax_loss_plot.figure.savefig("./figs/D3_SGD_convergence_plot.png")
+    ax_loss_plot.figure.savefig("./figs/D3_SGD_convergence_over_batches_plot.png")
 
 
 
