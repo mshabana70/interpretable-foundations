@@ -617,7 +617,9 @@ $$\theta_{t+1} = \theta_{t} - \eta\left( \frac{1}{B} \sum_{j \in S_{t}} \nabla L
 
 $$L(w,b) = \frac{1}{N}\sum_{i=1}^{N}\big(\underbrace{wx_i + b}_{\hat y_i} - y_i\big)^2$$
 
+**Question:** Why is SGD noiser but often faster?
 
+**Answer:** SGD follows mini-batch estimates to descent to the minimum of a objective function. This means we do not need to compute the gradient of each data point in order to find the optimal steepest descent. We instead take a small sample of data points and compute the gradient of those to give us a estimate that we can trust to get us down the loss space faster. This is noisy though since it does not really take into account all data sample when updating our parameters. 
 
 ## Week 6 - Probability & Statistics for ML
 
