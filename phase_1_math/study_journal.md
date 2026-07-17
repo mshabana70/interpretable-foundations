@@ -621,6 +621,44 @@ $$L(w,b) = \frac{1}{N}\sum_{i=1}^{N}\big(\underbrace{wx_i + b}_{\hat y_i} - y_i\
 
 **Answer:** SGD follows mini-batch estimates to descent to the minimum of a objective function. This means we do not need to compute the gradient of each data point in order to find the optimal steepest descent. We instead take a small sample of data points and compute the gradient of those to give us a estimate that we can trust to get us down the loss space faster. This is noisy though since it does not really take into account all data sample when updating our parameters. 
 
+### Friday 7/17
+
+Still catching up, working on Adam optimizer today:
+
+We did SGD and Momentum GD the past couple of days, where we compute gradients either by sampling over a batch of data examples, or by adding a momentum term to the descent to help with dampening and a running accumulation of gradients as we descend to the minimum.
+
+> NOTE: we did not make a note on Exponentially Weighted Moving Average (EWMA)... But when computing the momentum term $v_t$, $\frac{1}{1 - \beta}$ gives us the rough number of terms that the current momentum will be heavily dependent on. For example, when $\beta = 0.9$, approx the past 10 gradients will heavily influence the momentum at the current point. As $\beta$ approaches 1, more of the past values or gradients will influence the momentum term. Conversly, as we approach 0, less of the past values or gradients will influence the momentum term. **Bias Correction:** $v_{t}^{corrected} = \frac{v_t}{1 - \beta^{t}}$
+
+**Adam Optimizer: Adaptive Moment Optimizer**
+
+In order to understand Adam, we need to understand *RMSprop* first. *RMSprop* is all about balancing the magnitude of our gradient steps across all parameter axes. For example, usually in vanilla GD, our gradient updates for the weights tend to be more noisy than the bias term, causing our descent to take large steps across the weight axis, but smaller ones across the bias axis. 
+
+We want to balance this out by taking scaled steps across each parameter of our gradient based on the magnitude of the gradient. The scaling of the steps is inverted, so a large gradient alters the learning rate to be much smaller ("This is a steep point on the surface, let me take a smaller step"). The inverse of this is true also, a small gradient means a larger gradient step ("This is a flat part of the surface, let's take a larger step"). 
+
+$$
+\begin{align*}
+v_{t} &=  \beta v_{t-1} + (1 - \beta) * \nabla f(\theta_t)^{2} \\
+\theta_{t + 1} &= \theta_t - \frac{\eta}{\sqrt{v_{t} + \epsilon}} \nabla f(\theta_{t})  
+\end{align*}
+$$
+
+Here, $\epsilon$ is so we avoid a division by zero. It is also important to remember that *RMSprop* get's its own hyperparameter $\beta$, it is not the same value as the hyperparameter for the momentum term.
+
+Now we combine both approaches. We take the benefits of momentum, which helps define which direction to accelerate in, and the benefits of RMSprop, which helps define how much we should step in that acceleration based on the scale of each gradient parameter. That is the Adam optimizer! Let's define it mathematically:
+
+Let $m_{t}$ be our momentum, and $v_{t}$ be our RMSprop term (adaptive step). We compute Adam as follows:
+
+$$
+\begin{align*}
+m_{t} &= \beta_{m}m_{t-1} + (1 - \beta_{m})\nabla f(\theta_t) \\
+v_{t} &= \beta_{v}v_{t-1} + (1 - \beta_{v})\nabla f (\theta_t)^{2} \\
+\hat{m_{t}} &= \frac{m_{t}}{1 - \beta_m^{t}} \\
+\hat{v_{t}} &= \frac{v_{t}}{1 - \beta_v^{t}} \\
+\theta_{t+1} &= \theta_{t} - \eta\frac{\hat{m_{t}}}{\sqrt{\hat{v_{t}}} + \epsilon}\\
+\end{align*}
+$$
+
+
 ## Week 6 - Probability & Statistics for ML
 
 ### Monday 7/13
