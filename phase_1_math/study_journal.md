@@ -615,6 +615,10 @@ We define a batch size as $B$ (e.g., $B = 64$). At each step, we sample a subset
 
 $$\theta_{t+1} = \theta_{t} - \eta\left( \frac{1}{B} \sum_{j \in S_{t}} \nabla L_{j}(\theta_{t}) \right)$$
 
+$$L(w,b) = \frac{1}{N}\sum_{i=1}^{N}\big(\underbrace{wx_i + b}_{\hat y_i} - y_i\big)^2$$
+
+
+
 ## Week 6 - Probability & Statistics for ML
 
 ### Monday 7/13
