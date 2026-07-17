@@ -570,6 +570,51 @@ The difference now is that instead of evaluating the gradient at $\theta_t$, we 
 
 Moving on to Stochastic gradient descent.
 
+The previous variants that we implemented where all about how we take a gradient step. For **Stochastic Gradient Descent (SGD)**, we are going to focus on what information we use to decide the direction of that gradient step.
+
+To see how and why SGD works, we need to define a objective function first. Generally, our total loss is computed by $f(\theta)$ which is almost always the average of the individual losses calculated over our entire dataset of $N$ examples.
+
+Let $L_{i}(\theta)$ be the loss for the $i$-th training example. The total objective function is:
+$$
+f(\theta) = \frac{1}{N}\sum_{i=1}^{N} L_{i}(\theta)
+$$
+
+**Full-batch SGD:**
+
+To do vanilla gradient descent, we need the gradient of the total loss:
+
+$$
+\begin{align*}
+\nabla f(\theta_{t}) &= \frac{1}{N} \sum_{i=1}^{N} \nabla L_{i}(\theta_{t}) \\
+\theta_{t+1} &= \theta_{t} - \eta\nabla f(\theta_{t})
+\end{align*}
+$$
+
+The issue with this approach is if $N$ is a billion or trillion, you must do a billion or trillion forward and backward passes just to update you parameters $\theta$ once. That is nuts so we gotta find a better way than this.
+
+**Stochastic Approach: Single-batch**
+
+The stochastic approach gives up on computing the exact gradient $\nabla f(\theta_t)$. Instead, at each step $t$, we draw a single index $i$ uniformly at random from our dataset $\{ 1, \ldots, N\}$. We then compute the gradient for *only that one example* and use it as our update:
+
+$$\theta_{t+1} = \theta_{t} - \eta\nabla L_{i}(\theta_{t})$$
+
+How does updating our gradient step based on a single, randomly chosen data point guarantee that we actually minimize the total loss function?
+
+The core justification for SGD is that the stochastic gradient is an **unbiased estimater** of the true gradient. Because we draw the sample $i$ uniformly at random, the expected value of our noisy gradient is exactly equal to the true gradient:
+$$
+\mathbb{E}[\nabla L_{i}(\theta_t)] = \frac{1}{N}\sum_{i=1}^{N}\nabla L_{i}(\theta_t) = \nabla f(\theta_t)
+$$
+
+*In expectation*, SGD moves us in the exact same direction as Vanilla GD. However, because it is an expectation, an *individual step* introduces variance or noise. This can actually be helpful as a single-batch step can help the GD bounce out of local minimums or shallow valleys in the loss space.
+
+**Stochastic Approach: Mini-batch**
+
+Here, the algorithm is not too much different than our single-batch. However, instead of taking one example at random from our dataset, we can take 32 or 128 samples and compute the gradient on that batch of examples. Helps find a balance between slow full dataset gradients and noisy single data point gradients. Here is how the update would look using a mini-batch approach:
+
+We define a batch size as $B$ (e.g., $B = 64$). At each step, we sample a subset of indices $S_{t} \subset \{1, \ldots, N\}$ where $|S_{t}| = B$. The update rule then becomes:
+
+$$\theta_{t+1} = \theta_{t} - \eta\left( \frac{1}{B} \sum_{j \in S_{t}} \nabla L_{j}(\theta_{t}) \right)$$
+
 ## Week 6 - Probability & Statistics for ML
 
 ### Monday 7/13
