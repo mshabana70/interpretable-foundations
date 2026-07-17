@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 rng = np.random.default_rng()
 
 def sample_func(x):
-    return (3*x) + 2 + np.random.normal(0.0, 0.5, size=len(x)) 
+    return (3*x) + 2 + rng.normal(0.0, 0.5, size=len(x)) 
 
 def eval_loss(point, dataset):
     x = dataset[:, 0]
@@ -26,13 +26,12 @@ def SGD(starting_params, dataset, lr=0.001, batch=64, n_iters=1000, tol=0.2):
     theta_t = starting_params
     step_history = [theta_t]
     curr_avg_loss = 5.0
-    loss_history = [curr_avg_loss]
+    loss_history = []
     t = 0
     
     while (curr_avg_loss > tol) and t < n_iters:
 
-        batch_samples_idx = random.sample(range(len(dataset)), batch)
-        batch_sample = [dataset[i] for i in batch_samples_idx]
+        batch_sample = rng.choice(dataset, size=batch, replace=False)
         
         # update params based on batches and our predefined partials
         grad_batch = []
@@ -82,13 +81,17 @@ def test():
     
     init_params = rng.uniform(5.0, 20.0, size=2)
     
+    step_history_1, loss_history_1, num_of_iters_1 = SGD(init_params, dataset, batch=1, n_iters=20000)
     step_history_32, loss_history_32, num_of_iters_32 = SGD(init_params, dataset, batch=32, n_iters=20000)
     step_history_64, loss_history_64, num_of_iters_64 = SGD(init_params, dataset, batch=64, n_iters=20000)
     step_history_128, loss_history_128, num_of_iters_128 = SGD(init_params, dataset, batch=128, n_iters=20000)
+    step_history_1000, loss_history_1000, num_of_iters_1000 = SGD(init_params, dataset, batch=1000, n_iters=20000)
 
-    ax_loss_plot = plot(step_history_32, loss_history_32, dataset, label=f"SGD Batch 32; Done in {num_of_iters_32}")
-    plot(step_history_64, loss_history_64, dataset, ax=ax_loss_plot, color="#ff0000", label=f"SGD Batch 64; Done in {num_of_iters_64}")
+    ax_loss_plot = plot(step_history_1, loss_history_1, dataset, label=f"SGD Batch 1; Done in {num_of_iters_1}")
+    plot(step_history_32, loss_history_32, dataset, ax=ax_loss_plot, color="#ff0000", label=f"SGD Batch 32; Done in {num_of_iters_32}")
+    plot(step_history_64, loss_history_64, dataset, ax=ax_loss_plot, color="#ff00ae", label=f"SGD Batch 64; Done in {num_of_iters_64}")
     plot(step_history_128, loss_history_128, dataset, ax=ax_loss_plot, color="#3700ff", label=f"SGD Batch 128; Done in {num_of_iters_128}")
+    plot(step_history_1000, loss_history_1000, dataset, ax=ax_loss_plot, color="#090610", label=f"SGD Batch 1000; Done in {num_of_iters_1000}")
     ax_loss_plot.figure.savefig("./figs/D3_SGD_convergence_plot.png")
 
 
