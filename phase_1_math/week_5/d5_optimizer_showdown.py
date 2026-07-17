@@ -54,7 +54,7 @@ def vanilla_GD(X, y, alpha=0.001, n_iters=10000, tol=1e-6):
         t += 1
     
     print(f"[VANILLA] LR = {alpha}; {t} iterations; Final Step: {step_history[-1]}; Final Loss: {loss_history[-1]}")
-    return predict(X, step_history[-1])
+    return predict(X, step_history[-1]), loss_history
 
 def momentum_GD(X, y, alpha=0.001, beta=0.9, n_iters=10000, tol=1e-6):
     
@@ -79,7 +79,7 @@ def momentum_GD(X, y, alpha=0.001, beta=0.9, n_iters=10000, tol=1e-6):
         t += 1
     
     print(f"[MOMENTUM] LR = {alpha}; Beta = {beta}; {t} iterations; Final Step: {step_history[-1]}; Final Loss: {loss_history[-1]}")
-    return predict(X, step_history[-1])
+    return predict(X, step_history[-1]), loss_history
 
 def nesterov_GD(X, y, alpha=0.001, beta=0.9, n_iters=10000, tol=1e-6):
     theta_t = np.zeros_like(X[0])
@@ -106,7 +106,7 @@ def nesterov_GD(X, y, alpha=0.001, beta=0.9, n_iters=10000, tol=1e-6):
         t += 1
     
     print(f"[NESTEROV] LR = {alpha}; Beta = {beta}; {t} iterations; Final Step: {step_history[-1]}; Final Loss: {loss_history[-1]}")
-    return predict(X, step_history[-1])
+    return predict(X, step_history[-1]), loss_history
 
 def SGD(X, y, batch=32, alpha=0.001, n_iters=10000):
     
@@ -121,8 +121,7 @@ def SGD(X, y, batch=32, alpha=0.001, n_iters=10000):
         y_batch = y[batch_sample_idx]
         grad = gradient(X_batch, y_batch, theta_t)
 
-        avg_grad = (1 / len(batch_sample_idx)) * sum(grad)
-        theta_t_1 = theta_t - alpha*avg_grad
+        theta_t_1 = theta_t - alpha*grad
 
         theta_t = theta_t_1
         curr_loss = loss(X, y, theta_t) # loss across dataset, not batch
@@ -131,7 +130,7 @@ def SGD(X, y, batch=32, alpha=0.001, n_iters=10000):
         t += 1
     
     print(f"[STOCHASTIC] LR = {alpha}; Batch = {batch}; {t} iterations; Final Step: {step_history[-1]}; Final Loss: {loss_history[-1]}")
-    return predict(X, step_history[-1])
+    return predict(X, step_history[-1]), loss_history
 
 
 def Adam(X, y, batch=32, alpha=0.001, beta=[0.9, 0.999], n_iters=10000, epsilon=1e-6):
@@ -151,10 +150,9 @@ def Adam(X, y, batch=32, alpha=0.001, beta=[0.9, 0.999], n_iters=10000, epsilon=
         X_batch = X[batch_sample_idx]
         y_batch = y[batch_sample_idx]
         grad = gradient(X_batch, y_batch, theta_t)
-        avg_grad = (1 / len(batch_sample_idx)) * sum(grad)
         
-        m_t = beta_m * curr_m + (1 - beta_m) * avg_grad
-        v_t = beta_v * curr_v + (1 - beta_v) * avg_grad
+        m_t = beta_m * curr_m + (1 - beta_m) * grad
+        v_t = beta_v * curr_v + (1 - beta_v) * (grad ** 2)
         m_hat_t = m_t / (1 - (beta_m ** t))
         v_hat_t = v_t / (1 - (beta_v ** t))
 
@@ -170,7 +168,7 @@ def Adam(X, y, batch=32, alpha=0.001, beta=[0.9, 0.999], n_iters=10000, epsilon=
         t += 1
     
     print(f"[ADAM] LR = {alpha}; Beta = {beta}; Batch = {batch}; {t} iterations; Final Step: {step_history[-1]}; Final Loss: {loss_history[-1]}")
-    return predict(X, step_history[-1])
+    return predict(X, step_history[-1]), loss_history
 
 def train(optimizer_fn, X, y, **kwargs):
     
@@ -191,22 +189,50 @@ if __name__ == "__main__":
     # prepend X with a column of 1s for our bias term
     X_aug = np.hstack((np.ones((X.shape[0], 1)), X)) # shape => N x (d + 1)
 
+    print(f"[STARTING] Unnormalized run")
     normal_pred = normal_eq(X_aug, y_np)
-    vanilla_GD_preds = train(vanilla_GD, X=X_aug, y=y_np)
-    momentum_GD_preds = train(momentum_GD, X=X_aug, y=y_np, beta=0.9)
-    nesterov_GD_preds = train(nesterov_GD, X=X_aug, y=y_np, beta=0.9)
-    SGD_preds = train(SGD, X=X_aug, y=y_np, batch=32)
-    Adam_preds = train(Adam, X=X_aug, y=y_np, batch=32, alpha=0.01)
+    vanilla_GD_preds, vanilla_GD_loss = train(vanilla_GD, X=X_aug, y=y_np, alpha=0.0001)
+    momentum_GD_preds, momentum_GD_loss = train(momentum_GD, X=X_aug, y=y_np, alpha=0.0001, beta=0.9)
+    nesterov_GD_preds, nesterov_GD_loss = train(nesterov_GD, X=X_aug, y=y_np, alpha=0.0001, beta=0.9)
+    SGD_preds, SGD_loss = train(SGD, X=X_aug, y=y_np, batch=32, alpha=0.0001)
+    Adam_preds, Adam_loss = train(Adam, X=X_aug, y=y_np, batch=32, alpha=0.01)
 
     y_preds_unnormalized = {
-        "vanilla": vanilla_GD_preds,
-        "momentum": momentum_GD_preds,
-        "nesterov": nesterov_GD_preds,
-        "SGD": SGD_preds,
-        "Adam": Adam_preds
+        "vanilla": [vanilla_GD_preds, vanilla_GD_loss],
+        "momentum": [momentum_GD_preds, momentum_GD_loss],
+        "nesterov": [nesterov_GD_preds, nesterov_GD_loss],
+        "SGD": [SGD_preds, SGD_loss],
+        "Adam": [Adam_preds, Adam_loss]
     }
 
+    print(f"[COMPLETE] Unnormalized run")
+
     # normalize our features then rerun:
+    print(f"[STARTING] Normalized run")
+    dataset_mean = X.mean()
+    dataset_std = X.std()
+    normalized_X = (X - dataset_mean) / dataset_std
+    normalized_X_aug = np.hstack((np.ones((normalized_X.shape[0], 1)), normalized_X))
+
+    normal_pred = normal_eq(normalized_X_aug, y_np)
+    vanilla_GD_preds, vanilla_GD_loss = train(vanilla_GD, X=normalized_X_aug, y=y_np)
+    momentum_GD_preds, momentum_GD_loss = train(momentum_GD, X=normalized_X_aug, y=y_np, beta=0.9)
+    nesterov_GD_preds, nesterov_GD_loss = train(nesterov_GD, X=normalized_X_aug, y=y_np, beta=0.9)
+    SGD_preds, SGD_loss = train(SGD, X=normalized_X_aug, y=y_np, batch=32)
+    Adam_preds, Adam_loss = train(Adam, X=normalized_X_aug, y=y_np, batch=32, alpha=0.01)
+
+    y_preds_normalized = {
+        "vanilla": [vanilla_GD_preds, vanilla_GD_loss],
+        "momentum": [momentum_GD_preds, momentum_GD_loss],
+        "nesterov": [nesterov_GD_preds, nesterov_GD_loss],
+        "SGD": [SGD_preds, SGD_loss],
+        "Adam": [Adam_preds, Adam_loss]
+    }
+    print(f"[COMPLETE] Normalized run")
+
+    # TODO: plot graphs now
+
+
 
 
 
