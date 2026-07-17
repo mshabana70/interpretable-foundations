@@ -19,7 +19,8 @@ def AdamOptimizer(starting_params, dataset, betas=[0.9, 0.999], alpha=0.001, bat
     N = len(dataset)
     beta_m, beta_v = betas[0], betas[1]
     theta_t = starting_params
-    curr_m, curr_v = np.zeros_like(theta_t)
+    curr_m = np.zeros_like(theta_t)
+    curr_v = np.zeros_like(theta_t)
 
     step_history = []
     loss_history = []
@@ -51,13 +52,15 @@ def AdamOptimizer(starting_params, dataset, betas=[0.9, 0.999], alpha=0.001, bat
         v_hat_t = v_t / (1 - (beta_v ** t))
 
         # compute grad update
-        theta_t -= (alpha * (m_hat_t / (np.sqrt(v_hat_t) + epsilon)))
+        theta_t_1 = theta_t - (alpha * (m_hat_t / (np.sqrt(v_hat_t) + epsilon)))
 
         # now we update our terms for the next cycle
-        curr_m = m_hat_t
-        curr_v = v_hat_t
+        curr_m = m_t
+        curr_v = v_t
+        theta_t = theta_t_1
 
-        avg_loss = (1 / batch) * sum([(theta_t[0] * point[0] + theta_t[1]) - point[1] for point in batch_sample])
+        #avg_loss = (1 / batch) * sum([((theta_t[0] * point[0] + theta_t[1]) - point[1]) ** 2 for point in batch_sample])
+        avg_loss = eval_loss(theta_t, dataset)
         step_history.append(theta_t)
         loss_history.append(avg_loss)
         t += 1
@@ -75,7 +78,6 @@ def SGD(starting_params, dataset, lr=0.001, batch=64, n_iters=1000, tol=0.2):
 
     theta_t = starting_params
     step_history = [theta_t]
-    curr_avg_loss = 5.0
     loss_history = []
     t = 0
     
@@ -104,7 +106,8 @@ def SGD(starting_params, dataset, lr=0.001, batch=64, n_iters=1000, tol=0.2):
         
         # our condition check is going to be on the current average loss over our batch:
         #curr_avg_loss = eval_loss(theta_t_1, dataset) # if we want smooth convergence curves
-        curr_avg_loss = (1 / float(batch)) * sum([((theta_t[0] * batch_point[0] + theta_t[1]) - batch_point[1]) ** 2 for batch_point in batch_sample])
+        #curr_avg_loss = (1 / float(batch)) * sum([((theta_t[0] * batch_point[0] + theta_t[1]) - batch_point[1]) ** 2 for batch_point in batch_sample])
+        curr_avg_loss = eval_loss(theta_t, dataset)
         loss_history.append(curr_avg_loss)
         t += 1
     
@@ -130,12 +133,14 @@ def test():
     dataset = np.column_stack((x, true_y))
     
     init_params = rng.uniform(5.0, 20.0, size=2)
-    adam_step_hist, adam_loss_hist, adam_iters = AdamOptimizer(init_params, dataset, batch=32, n_iters=20000)
-    SGD_step_hist, SGD_loss_hist, SGD_iters = SGD(init_params, dataset, batch=32, n_iters=20000)
+    adam_step_hist, adam_loss_hist, adam_iters = AdamOptimizer(init_params, dataset, batch=32, n_iters=10000)
+    adam2_step_hist, adam2_loss_hist, adam2_iters = AdamOptimizer(init_params, dataset, alpha=0.01, batch=32, n_iters=10000)
+    SGD_step_hist, SGD_loss_hist, SGD_iters = SGD(init_params, dataset, batch=32, n_iters=10000)
 
     # get a plot to compare loss convergence
-    ax_conv = plot(adam_step_hist, adam_loss_hist, dataset, color="#1900ff", label=f"Adam (batch = 32; iters = {adam_iters})")
-    plot(SGD_step_hist, SGD_loss_hist, dataset, ax=ax_conv, color="#ff0000", label=f"SGD (batch = 32; iters = {adam_iters})")
+    ax_conv = plot(adam_step_hist, adam_loss_hist, dataset, color="#1900ff", label=f"Adam (batch = 32; LR = 0.001)")
+    plot(adam2_step_hist, adam2_loss_hist, dataset, ax=ax_conv, color="#008600", label=f"Adam (batch = 32; LR = 0.01)")
+    plot(SGD_step_hist, SGD_loss_hist, dataset, ax=ax_conv, color="#ff0000", label=f"SGD (batch = 32)")
     ax_conv.figure.savefig("./figs/D4_adam_vs_SGD_loss_plot.png")
 
 if __name__ == "__main__":
