@@ -796,5 +796,25 @@ $$
 
 **Answer:** Likelihood is really for determining the parameters for a target distribution given the data you have. While probability is about the how likely a data sample is to occur based on a known distribution that the data fits.
 
+---
 
+**Bayes Theorem:**
 
+The definition of Bayes theorem:
+
+$$p(\textbf{x}|\textbf{y}) = \frac{p(\textbf{y} | \textbf{x})p(\textbf{x}) }{p(\textbf{y})}$$
+
+Where:
+- $p(\textbf{x}|\textbf{y})$ is the *posterior* which allows us to compute the probability of $\textbf{x}$ given the observation of $\textbf{y}$.
+- $p(\textbf{y}|\textbf{x})$ is the *likelihood* which tells us how likely our observed $\textbf{y}$ will happen given $\textbf{x}$.
+- $p(\textbf{x})$ is the *prior*
+- $p(\textbf{y})$ is the *evidence*
+
+We should also be aware of the **Product Rule**  where we can compute the joint probability of $\textbf{x}$ and $\textbf{y}$:
+
+$$
+\begin{align*}
+p(\textbf{x}, \textbf{y}) &= p(\textbf{x} | \textbf{y})p(\textbf{y}) \\
+p(\textbf{x}, \textbf{y}) &= p(\textbf{y} | \textbf{x})p(\textbf{x})
+\end{align*}
+$$
