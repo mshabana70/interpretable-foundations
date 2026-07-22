@@ -2,7 +2,7 @@ import math
 import numpy as np
 import pandas as pd
 
-def generate_bayes_dataset(num_patients=10000, base_rate=0.01, sensitivity=0.80, specificity=0.90):
+def generate_bayes_dataset(num_patients=10000, base_rate=0.01, sensitivity=0.99, specificity=0.99):
     np.random.seed(42)
 
     # going to assign disease status based on Base Rate
