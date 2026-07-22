@@ -818,3 +818,16 @@ p(\textbf{x}, \textbf{y}) &= p(\textbf{x} | \textbf{y})p(\textbf{y}) \\
 p(\textbf{x}, \textbf{y}) &= p(\textbf{y} | \textbf{x})p(\textbf{x})
 \end{align*}
 $$
+
+### Wednesday 7/22
+
+Today we need to implement the Gaussian class:
+
+The PDF formula is:
+
+$$f(x) = \frac{1}{\sqrt{2\pi\sigma^{2}}} e^{-\frac{(x - \mu)^{2}}{2\sigma^{2}}}$$
+
+The pdf of the log-normal distribution is:
+
+$$f(x) = \frac{1}{x\sqrt{2\pi\sigma^{2}}} e^{-\frac{(\ln{x} - \mu)^{2}}{2\sigma^{2}}}$$
+
