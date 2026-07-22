@@ -827,7 +827,15 @@ The PDF formula is:
 
 $$f(x) = \frac{1}{\sqrt{2\pi\sigma^{2}}} e^{-\frac{(x - \mu)^{2}}{2\sigma^{2}}}$$
 
-The pdf of the log-normal distribution is:
+The Log PDF that returns the log of the density is:
 
-$$f(x) = \frac{1}{x\sqrt{2\pi\sigma^{2}}} e^{-\frac{(\ln{x} - \mu)^{2}}{2\sigma^{2}}}$$
+$$
+\begin{align*}
+\log{f(x)} &= \log \left( \frac{1}{\sqrt{2\pi\sigma^{2}}} e^{-\frac{(x - \mu)^{2}}{2\sigma^{2}}}\right) \\
+&= \log \left( (2\pi\sigma^{2})^{-\frac{1}{2}}\right) + \log \left( \exp(- \frac{(x - \mu)^{2}}{2\sigma^{2}})\right) \\
+&= -\frac{1}{2}\log(2\pi\sigma^{2}) - \frac{(x - \mu)^{2}}{2\sigma^{2}} \\
+&= -\frac{1}{2}[\log(2\pi) + \log(\sigma^{2})] - \frac{(x - \mu)^{2}}{2\sigma^{2}} \\
+&= -\frac{1}{2}\log(2\pi) - \frac{1}{2}\log(\sigma^{2}) - \frac{(x - \mu)^{2}}{2\sigma^{2}}
+\end{align*}
+$$
 
