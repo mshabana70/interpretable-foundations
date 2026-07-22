@@ -839,3 +839,7 @@ $$
 \end{align*}
 $$
 
+
+**Question:** Why are Gaussians so prevalent in ML?
+
+**Answer:** I believe this is due to the Central Limit Theorem, where all random collections of data eventually approach the normal distribution as the number of samples collected (or N) reaches infinity. And since ML's main objective is to see patterns in data distributions, it can often begin with the assumption of a gaussian distribution as the underlying distribution of the dataset given to the model. Of course this doesn't apply in all scenarios and is really just a general assumption.
