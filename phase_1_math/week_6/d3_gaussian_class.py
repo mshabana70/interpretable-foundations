@@ -13,7 +13,7 @@ class Gaussian():
         return (1 / np.sqrt(2 * np.pi * self.std ** 2)) * np.exp((- (data - self.mean) ** 2) / (2 * self.std ** 2))
 
     def log_pdf(self, data):
-        return (-0.5 * (2 * np.pi)) - (0.5 * np.log(self.std ** 2)) - (((data - self.mean) ** 2) / (2 * self.std **2))
+        return (-0.5 * np.log(2 * np.pi)) - (0.5 * np.log(self.std ** 2)) - (((data - self.mean) ** 2) / (2 * self.std **2))
 
     def sample(self, num_samples):
         pass
