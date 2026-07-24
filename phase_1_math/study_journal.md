@@ -843,3 +843,84 @@ $$
 **Question:** Why are Gaussians so prevalent in ML?
 
 **Answer:** I believe this is due to the Central Limit Theorem, where all random collections of data eventually approach the normal distribution as the number of samples collected (or N) reaches infinity. And since ML's main objective is to see patterns in data distributions, it can often begin with the assumption of a gaussian distribution as the underlying distribution of the dataset given to the model. Of course this doesn't apply in all scenarios and is really just a general assumption.
+
+### Thursday 7/23
+
+What is a mixture exactly?
+
+To make one data point: first flip a weighted coin to pick a cluster (component 1 with probability $\pi_{1}$, component 2 with probability $\pi_{2}$). Then draw a number from that cluster's Gaussian. So now every data point has a secret: which coin-flip made it. 
+
+We'll call that secret $z_i \in {1, 2}$ the *latent variable*. So you always see $x_{i}$ but never $z_{i}$.
+
+$$
+p(x) = \underbrace{\pi_1}_{\text{coin}}, \qquad \underbrace{\mathcal{N}(x \mid \mu_1, \sigma_1^2)}_{\text{cluster 1}} + \pi_2, \qquad \mathcal{N}(x \mid \mu_2, \sigma_2^2), \qquad \pi_1 + \pi_2 = 1
+$$
+
+So when we look at this geometrically, we see two bell curves, each scaled down by its coin-weight, added toegther. End up with a lumpy curve.
+
+> NOTE: In our day 3 code, on line 151 we used the numerical constant $\pi$ (3.1415...) as opposed to a probability value. When mixing two gaussians, $\pi_1$ and $\pi_2$ represent to probability values that sum to 1. For example $\pi_1 = 0.9$ and $\pi_2 = 0.1$. Need to keep this in mind and fix the bug in yesterday's code.
+
+
+SO why can't we just use the MLE directly here?
+
+On monday, MLE on a single gaussian was clean because the log killed the exponents:
+
+$$
+\log \prod_i \mathcal{N}(x_i\mid\mu,\sigma) = \sum_i \log \mathcal{N}(\dots) = \sum_i \Big[ -\tfrac{(x_i-\mu)^2}{2\sigma^2} - \log\sigma - \dots\Big]
+$$
+
+This gives us a clean sum where we can take the derivative and set to zero and get a closed form expression. That the `fit` function pretty much.
+
+Now if we write the log-likelihood for the mixture of gaussians, we can see that break:
+
+$$
+\begin{align*}
+\log \prod_i \Big[\pi_1\mathcal{N}(x_i\mid\mu_1,\sigma_1) + \pi_2\mathcal{N}(x_i\mid\mu_2,\sigma_2)\Big] = \sum_i \log\Big(\underbrace{\pi_1\mathcal{N}_1 + \pi_2\mathcal{N}2}_{\textbf{sum trapped inside the log}}\Big)
+\end{align*}
+$$
+
+The log now sits on top of a sum, and $\log(a + b)$ does not simplify and the exp never simplifies. Take $\partial/\partial\mu_1$ and you don't get a closed form; you get an equation where $\mu_1$ depends on how much each point belongs to cluster 1, which also depends on $\mu_1$. This becomes circular and doesn't have an algebraic solution.
+
+**In summary:** In a single gaussian the log distributes over a product and the exp cancels, giving closed-form estimates; in a mixture the sum sits inside the log, the exp survives, and the parameter equations become circular -> each cluster's fit depends on assignments that depend on the fit.
+
+This is pretty much what the **Expectation-Maximization (EM) Algorithm** is trying to resolve, the circularity we described before. If we knew the secret $z_{i}$ (hard labels, "point x came from cluster 1"), the problem becomes like what we did on monday. We can just sort each data point into two piles and run MLE on each separately.
+
+So we need to find the missing $z$:
+
+- Knowing the *parameters* -> we can guess the labels (a point near cluster 1's mean probably came from cluster 1).
+- Knowing the *labels* -> You can compute the parameters (run fit on each pile).
+
+So we guess one to compute the other and repeat as it improves each round. Let's break the EM algo down with this insight:
+
+**EM Algorithm:**
+
+*E-step* => "Given my current guess, what cluster owns each data point?" (bayes)
+
+Instead of a hard label, EM computes the probability that point $i$ was made by component $k$, given where it landed.
+
+$$
+r_{ik} = P(z_i = k \mid x_i) = \frac{\pi_k,\mathcal{N}(x_i\mid\mu_k,\sigma_k)}{\sum_{j}\pi_j,\mathcal{N}(x_i\mid\mu_j,\sigma_j)}
+$$
+
+Lets compare it to our tueday bayesian assignment:
+
+| Bayes (Tues) | EM E-Step |
+|-- | -- |
+| prior $P(D)$ = Base Rate | prior $\pi_k$ = mixing weight |
+| likelihood $P(+ \mid D)$ = sensitivity | likelihood $\mathcal{N}(x_i \mid \mu_k, \sigma_k)$ |
+| evidence $P(+)$ = normalizer | denominator $\sum_j\pi_j\mathcal{N}_j$ |
+| posterior $P(D\mid +)$ | responsibility $r_{ik}$ |
+
+The term $r_{ik}$ is a fractional term. A point sitting between two clusters might be 0.7 owned by cluster 1 and 0.3 owned by cluster 2. This "soft" ownership is what makes EM differentiable and stable as opposed to hard assignments (like k-means) is jumpy. Each row of responsibilities sums to 1: $r_{i1} + r_{i2} = 1$.
+
+*M-step* => "Given who owns what, re-fit each cluster" (weighted MLE)
+
+Now we can just rerun MLE (like we did monday), but every point contributes to cluster $k$ *in proportion to its responsibility $r_{ik}$*:
+
+$$
+\mu_k = \frac{\sum_i r_{ik},x_i}{\sum_i r_{ik}} \qquad \sigma_k^2 = \frac{\sum_i r_{ik},(x_i - \mu_k)^2}{\sum_i r_{ik}} \qquad \pi_k = \frac{\sum_i r_{ik}}{N}
+$$
+
+- $\mu_{k}$ = **responsibility-weighted mean**. Points that mostly belong to $k$ have greater influence; barely-owned points don't influence much.
+- $\sigma_k$ = **responsibility-weighted variance**. Note the denominator is $\sum_i r_{ik}$, the "effective number of points" cluster $k$ owns.
+- $\pi_k$ = **total responsibility mass $\div$ N**. If cluster 1 softly owns 300 of 1000 points, $\pi_1 = 0.3$
