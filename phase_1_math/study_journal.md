@@ -924,3 +924,16 @@ $$
 - $\mu_{k}$ = **responsibility-weighted mean**. Points that mostly belong to $k$ have greater influence; barely-owned points don't influence much.
 - $\sigma_k$ = **responsibility-weighted variance**. Note the denominator is $\sum_i r_{ik}$, the "effective number of points" cluster $k$ owns.
 - $\pi_k$ = **total responsibility mass $\div$ N**. If cluster 1 softly owns 300 of 1000 points, $\pi_1 = 0.3$
+
+This is what the loop looks like:
+
+initialize $\mu$, $\sigma$, $\pi$ ( a guess)  
+repeat:  
+&emsp;E-step: compute $r_{ik}$ for all i, k  
+&emsp;M-step: recompute $\mu_k$, $\sigma_k$, $\pi_k$ from $r$  
+until log-likelihood stops increasing
+
+> NOTE: Each E-then-M round **provably does not decrease** the log-likelihood, it monotonically climbs to a fixed point. The proof is **Jensen's inequality** building a lower bound that touches the true likelihood at the current params, then the M-step maximizes that bound. What it DOES NOT guarantee is the global maximum. The mixture of gaussians likelihood is non-convex, so EM lands in whatever basin you started in. A different init -> different answer.
+
+
+
