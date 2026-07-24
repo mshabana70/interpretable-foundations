@@ -148,7 +148,7 @@ def test():
     # let's try ploting a third
     y3 = Gaussian(2.0, 5.0).pdf(x_ax)
 
-    mixture_y1_y2 = (np.pi * y1) + (np.pi * y2) 
+    mixture_y1_y2 = (0.5 * y1) + (0.5 * y2) # needs to be probabilities that sum to 1
 
     plt.figure(figsize=(8, 5))
     plt.plot(x_ax, y1, label=r'$\mu=5.0, \sigma=2.0$', color='blue', linewidth=2)
