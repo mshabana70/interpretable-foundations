@@ -1,5 +1,11 @@
 import math
 import numpy as np
+import matplotlib
+
+
+# for wsl execution
+matplotlib.use("Agg")
+
 import matplotlib.pyplot as plt
 
 rng = np.random.default_rng(0)
