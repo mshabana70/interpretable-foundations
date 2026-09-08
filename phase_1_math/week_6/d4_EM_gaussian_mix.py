@@ -22,13 +22,13 @@ class Gaussian():
 def em_algo(observations, dist_1, dist_2, pi_1, pi_2):
 
     # create two initialized gaussians
-    mean_guess_1 = rng.normal(scale=10.0, size=1)
-    std_guess_1 = abs(rng.normal(scale=5.0, size=1)) # std needs to be positive
+    mean_guess_1 = rng.normal(scale=10.0, size=1)[0]
+    std_guess_1 = abs(rng.normal(scale=5.0, size=1))[0] # std needs to be positive
     weight_guess_1 = rng.random()
     init_dist_1 = Gaussian(mean_guess_1, std_guess_1)
 
-    mean_guess_2 = rng.normal(scale=10.0, size=1)
-    std_guess_2 = abs(rng.normal(scale=5.0, size=1))
+    mean_guess_2 = rng.normal(scale=10.0, size=1)[0]
+    std_guess_2 = abs(rng.normal(scale=5.0, size=1))[0]
     weight_guess_2 = 1.0 - weight_guess_1 # both weights needs to sum to 1
     init_dist_2 = Gaussian(mean_guess_2, std_guess_2)
 
