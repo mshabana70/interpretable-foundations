@@ -18,13 +18,6 @@ class Gaussian():
     def sample(self, num_samples):
         return rng.normal(self.mean, self.std, size=num_samples)
 
-    def fit(self, x, weight_mean=1.0, weight_std=1.0):
-        # we added mixture weight parameters so that we can do fitting for the Gaussian Mixture Model.
-        # it defaults to 1.0 if that is not the case, leaving the mean and std unaffected if not defined.
-        mle_mean = np.mean(x) * weight_mean 
-        mle_std = np.std(x) * weight_std
-        return mle_mean, mle_std
-
 # TODO: Need to implement the EM algorithm for a 2-component gaussian mixture model and test on synthetic data with two clusters.
 def em_algo(observations, dist_1, dist_2, pi_1, pi_2):
 
@@ -100,11 +93,11 @@ def em_algo(observations, dist_1, dist_2, pi_1, pi_2):
     print(f"===== EM Algorithm Completed in {iter} iterations ====")
     print(f"True G1 Mean: {dist_1.mean} | Estimated G1 Mean: {mean_guess_1}")
     print(f"True G1 Std: {dist_1.std} | Estimated G1 Std: {std_guess_1}")
-    print(f"True G1 mixture weight: {pi_1} | Estimated G1 mixture weight: {pi_1}")
+    print(f"True G1 mixture weight: {pi_1} | Estimated G1 mixture weight: {weight_guess_1}")
 
     print(f"True G2 Mean: {dist_2.mean} | Estimated G1 Mean: {mean_guess_2}")
     print(f"True G2 Std: {dist_2.std} | Estimated G1 Std: {std_guess_2}")
-    print(f"True G2 mixture weight: {pi_2} | Estimated G1 mixture weight: {pi_2}")
+    print(f"True G2 mixture weight: {pi_2} | Estimated G1 mixture weight: {weight_guess_2}")
         
 
 def test():
