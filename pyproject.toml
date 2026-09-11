@@ -11,6 +11,7 @@ dependencies = [
     "scikit-learn",
     "torch",
     "kagglehub",
+    "pytest>=9.1.1",
 ]
 
 [build-system]
