@@ -10,6 +10,8 @@ import numpy as np
 # w (d x 1 vector)
 # y (n x 1 vector)
 
+# adding an rng for weight initialization
+rng = np.random.default_rng(seed=42)
 
 def predict(X, w):
     """
@@ -17,7 +19,6 @@ def predict(X, w):
 
     Since there is no bias value yet, y_hat = X * w
     """
-
     return X @ w # output shape should be n x 1 vector, matching shape of y
 
 def loss(X, y, w):
@@ -60,3 +61,28 @@ def numerical_gradient(X, y, w, h=1e-5):
 
     return grad_vec
 
+def fit_gradient_descent(X, y, w=None, lr=1e-3, iters=50):
+    # now we FINALLY get to the training loop lol (T_T).
+    # for this we need to initialize our weights if it's not provided,
+    # which is realistic in pretty much all training loops.
+    
+    if w is None:
+        w = rng.random((X.shape[1], 1)) # random init between 0 and 1
+
+    # build our arrays that capture values we care about in the loop
+    w_t = w.copy()
+    record = {
+        "loss": [], 
+        "weights": [w_t] # this will be a list of our updated weight vecs
+    }
+    # now we define the loop
+    for t in range(iters):
+        curr_grad = gradient(X, y, w_t) # leaving numerical gradient as a verifier
+
+        w_t -= lr * curr_grad
+        curr_loss = loss(X, y, w_t) # this isn't necessary, it's really just for stdout. Also, I am measuring loss AFTER the weight update
+        record["weights"].append(w_t.copy()) # store COPIES
+        record["loss"].append(curr_loss)
+        print(f"Iteration {t}: loss = ({curr_loss}), curr_weights = ({w_t})") # this should be decreasing every iter
+
+    return (record["weights"][-1], record["loss"]) # return the last weight update, as well as the list of losses during training 
