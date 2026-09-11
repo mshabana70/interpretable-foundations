@@ -69,6 +69,8 @@ def fit_gradient_descent(X, y, w=None, lr=1e-3, iters=50):
     if w is None:
         w = rng.random((X.shape[1], 1)) # random init between 0 and 1
 
+    # TODO: do some feature scaling because our training is not converging!!!
+
     # build our arrays that capture values we care about in the loop
     w_t = w.copy()
     record = {
