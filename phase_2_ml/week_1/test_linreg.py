@@ -1,4 +1,4 @@
-from linreg import predict, loss, gradient
+from linreg import predict, loss, gradient, numerical_gradient
 import numpy as np
 import pytest
 
@@ -19,12 +19,17 @@ def test_predict_shape(create_vars):
 def test_loss_shape(create_vars):
     X, y, w = create_vars
     loss_val = loss(X, y, w) 
-    assert len(loss_val) == 1
+    assert isinstance(loss_val, float)
 
 def test_gradient_shape(create_vars):
     X, y, w = create_vars
     grad = gradient(X, y, w)
     assert grad.shape == w.shape
+
+def test_numerical_gradient_shape(create_vars):
+    X, y, w = create_vars
+    num_grad = numerical_gradient(X, y, w)
+    assert num_grad.shape == w.shape
  
 def test_loss_calculation(create_vars):
     X, y, w = create_vars
@@ -41,3 +46,10 @@ def test_loss_manual():
     loss_by_hand = np.array([[1146.5]]) # on scratch paper
     func_loss = loss(X, y, w)
     np.testing.assert_allclose(loss_by_hand, func_loss)
+
+def test_numerical_gradient_calculation(create_vars):
+    X, y, w = create_vars
+
+    predef_grad = gradient(X, y, w)
+    num_grad = numerical_gradient(X, y, w)
+    np.testing.assert_allclose(predef_grad, num_grad)
