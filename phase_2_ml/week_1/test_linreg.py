@@ -102,7 +102,7 @@ def test_training_loop_real_dataset(create_dataset):
     assert X_scaled.shape == (X.shape[0], X.shape[1] + 1)
 
     # we have values for our variables so now we can test our training loop
-    final_weights, loss_vals = fit_gradient_descent(X_scaled, y, lr=1e-1)
+    final_weights, loss_vals = fit_gradient_descent(X_scaled, y, lr=1e-1, iters=100)
 
     # we are going to compare against numpy's linalg.lstsq method
     numpy_weights = np.linalg.lstsq(X_scaled, y, rcond=None)[0]
