@@ -61,6 +61,50 @@ def numerical_gradient(X, y, w, h=1e-5):
 
     return grad_vec
 
+def apply_standardizer(X, stats: dict):
+
+    X_scaled = np.zeros(X.shape)
+    # return X_scaled
+    for feature in stats["features"]:
+        idx = feature["idx"]
+        mean = feature["mean"]
+        std = feature["std"]
+
+        # Z-score normalization => z_j = (x_ij - mu_j) / sigma_j for all i in X_j
+        X_temp = X.copy()
+        X_scaled[:, idx] = (X_temp[:, idx] - mean) / std
+
+    # add an intercept column to match the design matrix returned by np.linalg.lstsq
+    # useful when verifying
+    intercept_col = np.zeros((X.shape[0], 1))
+    X_scaled = np.hstack((intercept_col, X_scaled)) 
+    return X_scaled
+
+def fit_standardizer(X):
+    """
+    Func for preprocessing and standardizing our dataset before being fed to the optimizer.
+    
+    We'll do standardization using the Z-score normalization in the apply_standarizer() func.
+    """
+
+    stats_dict = {"features": []}
+    # first let's grab the means and standard deviations from each feature of X
+    means = np.mean(X, axis=0) # column-wise means
+    stand_devs = np.std(X, axis=0)
+    for j in range(X.shape[1]):
+        print(f"Feature {j}: mean = {means[j]}; std = {stand_devs[j]}")
+        stats_dict["features"].append({
+            "idx": j,
+            "mean": means[j],
+            "std": stand_devs[j],
+            "max": max(X[:, j]),
+            "min": min(X[:, j]),
+        })
+
+    X_scaled = apply_standardizer(X, stats_dict)
+
+    return X_scaled, stats_dict
+
 def fit_gradient_descent(X, y, w=None, lr=1e-3, iters=50):
     # now we FINALLY get to the training loop lol (T_T).
     # for this we need to initialize our weights if it's not provided,
@@ -85,6 +129,6 @@ def fit_gradient_descent(X, y, w=None, lr=1e-3, iters=50):
         curr_loss = loss(X, y, w_t) # this isn't necessary, it's really just for stdout. Also, I am measuring loss AFTER the weight update
         record["weights"].append(w_t.copy()) # store COPIES
         record["loss"].append(curr_loss)
-        print(f"Iteration {t}: loss = ({curr_loss}), curr_weights = ({w_t})") # this should be decreasing every iter
+        print(f"Iteration {t}: loss = ({curr_loss})") # this should be decreasing every iter
 
     return (record["weights"][-1], record["loss"]) # return the last weight update, as well as the list of losses during training 

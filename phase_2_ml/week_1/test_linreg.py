@@ -3,7 +3,7 @@ import pandas as pd
 import pytest
 import os
 
-from linreg import predict, loss, gradient, numerical_gradient, fit_gradient_descent
+from linreg import predict, loss, gradient, numerical_gradient, fit_gradient_descent, fit_standardizer
 import kagglehub
 from pathlib import Path
 
@@ -95,12 +95,17 @@ def test_training_loop_real_dataset(create_dataset):
     assert X.ndim == 2
     assert y.shape == (X.shape[0], 1)
 
+    # before we do training let's standardize our dataset
+    X_scaled, stats = fit_standardizer(X)
+    print(f"Rescaled dataset shape: {X_scaled.shape}")
+    assert X_scaled.ndim == 2
+    assert X_scaled.shape == (X.shape[0], X.shape[1] + 1)
+
     # we have values for our variables so now we can test our training loop
-    final_weights, loss_vals = fit_gradient_descent(X, y)
-    assert final_weights.shape == (X.shape[1], 1)
+    final_weights, loss_vals = fit_gradient_descent(X_scaled, y, lr=1e-1)
 
     # we are going to compare against numpy's linalg.lstsq method
-    numpy_weights = np.linalg.lstsq(X, y, rcond=None)[0]
+    numpy_weights = np.linalg.lstsq(X_scaled, y, rcond=None)[0]
     np.testing.assert_allclose(final_weights, numpy_weights)
 
 
