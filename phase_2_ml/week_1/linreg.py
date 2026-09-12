@@ -72,7 +72,10 @@ def apply_standardizer(X, stats: dict):
 
         # Z-score normalization => z_j = (x_ij - mu_j) / sigma_j for all i in X_j
         X_temp = X.copy()
-        X_scaled[:, idx] = (X_temp[:, idx] - mean) / std
+        if std != 0.0:
+            X_scaled[:, idx] = (X_temp[:, idx] - mean) / std
+        else:
+            X_scaled[:, idx] = 0.0
 
     # add an intercept column to match the design matrix returned by np.linalg.lstsq
     # useful when verifying
