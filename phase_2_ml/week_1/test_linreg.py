@@ -108,17 +108,21 @@ def test_training_loop_real_dataset(create_dataset):
     # we have values for our variables so now we can test our training loop
     final_weights, loss_vals, grad_vals = fit_gradient_descent(X_scaled, y, lr=1e-1, iters=150)
 
-    # we are going to compare against numpy's linalg.lstsq method
-    numpy_weights, resid, _, _ = np.linalg.lstsq(X_scaled, y, rcond=None)[0]
 
-    # let's do some checks on the loss and grad here
+
+    # we are going to compare against numpy's linalg.lstsq method
+    numpy_weights, resid, _, _ = np.linalg.lstsq(X_scaled, y, rcond=None)
+
+    # get numpy's loss because np.linalg.lstsq doesn't return loss (T_T)
+    numpy_loss = loss(X_scaled, y, numpy_weights)
+    numpy_final_grad = gradient(X_scaled, y, numpy_weights)
+    numpy_final_grad_norm = np.linalg.norm(numpy_final_grad)
     final_grad_norm = np.linalg.norm(grad_vals[-1])
-    print(f"Final gradient norm: {final_grad_norm}")
-    numpy_loss = resid[0] if resid.size > 0 else None
+
+    print(f"Final gradient norm: {final_grad_norm}, numpy's final gradient norm: {numpy_final_grad_norm}")
     np.testing.assert_allclose(loss_vals[-1], numpy_loss)
 
     # let's debug some more and see what the final gradients norm is
-    
     np.testing.assert_allclose(final_weights, numpy_weights)
 
 

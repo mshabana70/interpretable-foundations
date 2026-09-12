@@ -136,6 +136,6 @@ def fit_gradient_descent(X, y, w=None, lr=1e-3, iters=50):
         record["weights"].append(weight_t.copy()) # store COPIES
         record["loss"].append(curr_loss)
         record["grads"].append(curr_grad)
-        print(f"Iteration {t + 1}: loss = ({curr_loss})") # this should be decreasing every iter
+        #print(f"Iteration {t + 1}: loss = ({curr_loss})") # this should be decreasing every iter
 
     return (record["weights"][-1], record["loss"], record["grads"]) # return the last weight update, as well as the list of losses during training 
