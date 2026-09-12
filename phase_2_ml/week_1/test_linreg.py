@@ -73,7 +73,7 @@ def test_numerical_gradient_calculation(create_vars):
 def test_training_loop_small_dataset(create_vars):
     X, y, w = create_vars
 
-    final_weights, loss_vals = fit_gradient_descent(X, y, w=w)
+    final_weights, loss_vals, grad_vals = fit_gradient_descent(X, y, w=w)
     initial_loss = loss(X, y, w)
     final_loss = loss_vals[-1]
     assert initial_loss > final_loss
@@ -97,15 +97,28 @@ def test_training_loop_real_dataset(create_dataset):
 
     # before we do training let's standardize our dataset
     X_scaled, stats = fit_standardizer(X)
+
+    # some stats tests to ensure our standardization did its job (excluding intercept col)
     print(f"Rescaled dataset shape: {X_scaled.shape}")
     assert X_scaled.ndim == 2
     assert X_scaled.shape == (X.shape[0], X.shape[1] + 1)
+    assert np.allclose(np.mean(X_scaled[:, 1:], axis=0), 0.0, atol=1e-7)
+    assert np.allclose(np.std(X_scaled[:, 1:], axis=0), 1.0, atol=1e-7)
 
     # we have values for our variables so now we can test our training loop
-    final_weights, loss_vals = fit_gradient_descent(X_scaled, y, lr=1e-1, iters=100)
+    final_weights, loss_vals, grad_vals = fit_gradient_descent(X_scaled, y, lr=1e-1, iters=150)
 
     # we are going to compare against numpy's linalg.lstsq method
-    numpy_weights = np.linalg.lstsq(X_scaled, y, rcond=None)[0]
+    numpy_weights, resid, _, _ = np.linalg.lstsq(X_scaled, y, rcond=None)[0]
+
+    # let's do some checks on the loss and grad here
+    final_grad_norm = np.linalg.norm(grad_vals[-1])
+    print(f"Final gradient norm: {final_grad_norm}")
+    numpy_loss = resid[0] if resid.size > 0 else None
+    np.testing.assert_allclose(loss_vals[-1], numpy_loss)
+
+    # let's debug some more and see what the final gradients norm is
+    
     np.testing.assert_allclose(final_weights, numpy_weights)
 
 

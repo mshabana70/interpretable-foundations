@@ -79,7 +79,7 @@ def apply_standardizer(X, stats: dict):
 
     # add an intercept column to match the design matrix returned by np.linalg.lstsq
     # useful when verifying
-    intercept_col = np.zeros((X.shape[0], 1))
+    intercept_col = np.ones((X.shape[0], 1))
     X_scaled = np.hstack((intercept_col, X_scaled)) 
     return X_scaled
 
@@ -119,19 +119,23 @@ def fit_gradient_descent(X, y, w=None, lr=1e-3, iters=50):
     # TODO: do some feature scaling because our training is not converging!!!
 
     # build our arrays that capture values we care about in the loop
-    w_t = w.copy()
+    weight_t = w.copy()
     record = {
         "loss": [], 
-        "weights": [w_t] # this will be a list of our updated weight vecs
+        "weights": [weight_t], # this will be a list of our updated weight vecs
+        "grads": []
     }
     # now we define the loop
     for t in range(iters):
-        curr_grad = gradient(X, y, w_t) # leaving numerical gradient as a verifier
 
-        w_t -= lr * curr_grad
-        curr_loss = loss(X, y, w_t) # this isn't necessary, it's really just for stdout. Also, I am measuring loss AFTER the weight update
-        record["weights"].append(w_t.copy()) # store COPIES
+        curr_grad = gradient(X, y, weight_t) # leaving numerical gradient as a verifier
+
+        weight_t -= lr * curr_grad
+
+        curr_loss = loss(X, y, weight_t) # this isn't necessary, it's really just for stdout. Also, I am measuring loss AFTER the weight update
+        record["weights"].append(weight_t.copy()) # store COPIES
         record["loss"].append(curr_loss)
+        record["grads"].append(curr_grad)
         print(f"Iteration {t + 1}: loss = ({curr_loss})") # this should be decreasing every iter
 
-    return (record["weights"][-1], record["loss"]) # return the last weight update, as well as the list of losses during training 
+    return (record["weights"][-1], record["loss"], record["grads"]) # return the last weight update, as well as the list of losses during training 
