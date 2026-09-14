@@ -3,7 +3,7 @@ import pandas as pd
 import pytest
 import os
 
-from linreg import predict, loss, gradient, numerical_gradient, fit_gradient_descent, fit_standardizer
+from linreg import predict, loss, gradient, numerical_gradient, fit_gradient_descent, fit_standardizer, plot_results
 import kagglehub
 from pathlib import Path
 
@@ -132,6 +132,6 @@ def test_training_loop_real_dataset(create_dataset):
     gd_weights = final_weights
     numpy_pred = predict(X_scaled, numpy_weights)
 
-    plot_results(gd_loss_hist, gd_preds, gd_weights, numpy_pred)
+    plot_results(gd_loss_hist, gd_preds, gd_weights, numpy_pred, numpy_loss, y)
 
 

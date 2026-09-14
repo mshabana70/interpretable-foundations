@@ -1,5 +1,8 @@
 import numpy as np
+import matplotlib
 import matplotlib.pyplot as plt
+
+matplotlib.use('Agg')
 
 # TODO: going to first start with the three core funcs
 # - predict(X, w)
@@ -142,11 +145,33 @@ def fit_gradient_descent(X, y, w=None, lr=1e-3, iters=50):
 
     return (record["weights"], record["loss"], record["grads"]) # return the last weight update, as well as the list of losses during training 
 
-def plot_results(loss_hist, preds, weights, numpy_preds):
+def plot_results(loss_hist, preds, weights, numpy_preds, numpy_loss, ground_truth):
 
-    # let's first plot the loss history
+    # let's first plot the loss history as it approaches LSTSQ
     iters = np.array([i for i in range(len(loss_hist))])
     fig, ax = plt.subplots(figsize=(8, 6))
 
     ax.plot(iters, loss_hist, color='blue', linestyle='-', linewidth=2, marker='o', label='GD Loss History')
+    ax.axhline(y=numpy_loss, color='red', linestyle='--', linewidth=2, label='Numpy LSTSQ Loss')
     ax.set_title('GD Loss over iterations', fontsize=14, fontweight='bold')
+    ax.set_xlabel('Iterations', fontsize=11)
+    ax.set_ylabel('Loss', fontsize=11)
+    ax.grid(True, linestyle='--', alpha=0.6)
+    ax.legend()
+    plt.savefig('figures/loss_history.png')
+
+    # now plot our GD preds vs Numpy's preds vs ground truth
+    # for this we should plot the differences between our preds, numpy's preds from the ground truth
+    fig, ax = plt.subplots(figsize=(8, 6))
+
+    gd_diffs = np.array([ground_truth[i] - preds[i] for i in range(len(preds))])
+    numpy_diffs = np.array([ground_truth[i] - numpy_preds[i] for i in range(len(preds))])
+
+    ax.plot(range(len(gd_diffs)), gd_diffs, color='blue', linestyle='-', label='GD Predictions Diff')
+    ax.plot(range(len(numpy_diffs)), numpy_diffs, color='red', linestyle='-', label='Numpy Predictions Diff')
+    ax.axhline(y=0, color='green', linestyle='--')
+    ax.set_title('Prediction Accuracy between GD & Numpy', fontsize=14, fontweight='bold')
+    ax.set_xlabel('Sample Index', fontsize=11)
+    ax.set_xlabel('Prediction Error', fontsize=11)
+    ax.legend()
+    plt.savefig('figures/prediction_accuracy.png')
