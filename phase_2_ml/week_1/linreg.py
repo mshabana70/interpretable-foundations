@@ -1,5 +1,5 @@
 import numpy as np
-
+import matplotlib.pyplot as plt
 
 # TODO: going to first start with the three core funcs
 # - predict(X, w)
@@ -125,7 +125,9 @@ def fit_gradient_descent(X, y, w=None, lr=1e-3, iters=50):
         "weights": [weight_t], # this will be a list of our updated weight vecs
         "grads": []
     }
-    # now we define the loop
+
+    # upgrading our loop to monitor convergence and iterations as a stopping condition
+    grad_norm = 10.0 # some arbitrary val initially
     for t in range(iters):
 
         curr_grad = gradient(X, y, weight_t) # leaving numerical gradient as a verifier
@@ -138,4 +140,13 @@ def fit_gradient_descent(X, y, w=None, lr=1e-3, iters=50):
         record["grads"].append(curr_grad)
         #print(f"Iteration {t + 1}: loss = ({curr_loss})") # this should be decreasing every iter
 
-    return (record["weights"][-1], record["loss"], record["grads"]) # return the last weight update, as well as the list of losses during training 
+    return (record["weights"], record["loss"], record["grads"]) # return the last weight update, as well as the list of losses during training 
+
+def plot_results(loss_hist, preds, weights, numpy_preds):
+
+    # let's first plot the loss history
+    iters = np.array([i for i in range(len(loss_hist))])
+    fig, ax = plt.subplots(figsize=(8, 6))
+
+    ax.plot(iters, loss_hist, color='blue', linestyle='-', linewidth=2, marker='o', label='GD Loss History')
+    ax.set_title('GD Loss over iterations', fontsize=14, fontweight='bold')
