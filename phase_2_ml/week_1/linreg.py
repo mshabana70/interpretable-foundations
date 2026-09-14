@@ -172,6 +172,6 @@ def plot_results(loss_hist, preds, weights, numpy_preds, numpy_loss, ground_trut
     ax.axhline(y=0, color='green', linestyle='--')
     ax.set_title('Prediction Accuracy between GD & Numpy', fontsize=14, fontweight='bold')
     ax.set_xlabel('Sample Index', fontsize=11)
-    ax.set_xlabel('Prediction Error', fontsize=11)
+    ax.set_ylabel('Prediction Error', fontsize=11)
     ax.legend()
     plt.savefig('figures/prediction_accuracy.png')
