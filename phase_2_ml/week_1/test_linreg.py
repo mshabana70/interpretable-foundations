@@ -78,6 +78,24 @@ def test_training_loop_small_dataset(create_vars):
     final_loss = loss_vals[-1]
     assert initial_loss > final_loss
 
+def test_dataset_conditioning(create_dataset):
+    data_path = create_dataset
+    vehicle_df = pd.read_csv(data_path + "/" + "car_data.csv")
+
+    X = vehicle_df[["Year", "Present_Price", "Kms_Driven"]].to_numpy()
+    y = vehicle_df['Selling_Price'].to_numpy()[:, None]
+    print(f"Cleaned up dataset values: x = {X.shape}, y = {y.shape}")
+
+    X_scaled, stats = fit_standardizer(X)
+
+    # get the conditions from our scaled and raw matrix X
+    raw_cond = np.linalg.cond(X)
+    scaled_cond = np.linalg.cond(X_scaled) # I expect this to be a smaller value due to the z-score normalization
+
+    print(f"Raw Condition Num: {raw_cond}\nScaled Condition Num: {scaled_cond}")
+    assert raw_cond > scaled_cond
+
+
 def test_training_loop_real_dataset(create_dataset):
     # now we test our linreg training on a REAL dataset.
     # going to use the vehicle dataset from kaggle: https://www.kaggle.com/datasets/nehalbirla/vehicle-dataset-from-cardekho    
@@ -107,8 +125,6 @@ def test_training_loop_real_dataset(create_dataset):
 
     # we have values for our variables so now we can test our training loop
     final_weights, loss_vals, grad_vals = fit_gradient_descent(X_scaled, y, lr=1e-1, iters=150)
-
-
 
     # we are going to compare against numpy's linalg.lstsq method
     numpy_weights, resid, _, _ = np.linalg.lstsq(X_scaled, y, rcond=None)
